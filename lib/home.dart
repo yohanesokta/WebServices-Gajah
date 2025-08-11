@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:xampp_clone/mariadbControl.dart';
-import 'package:xampp_clone/nginxControl.dart';
-import 'package:xampp_clone/phpVersion.dart';
+import '/components/mariadbControl.dart';
+import '/components/nginxControl.dart';
+import '/components/phpVersion.dart';
 
 class HomeApp extends StatefulWidget {
   const HomeApp({super.key});
@@ -11,7 +11,6 @@ class HomeApp extends StatefulWidget {
 }
 
 class _HomeAppState extends State<HomeApp> {
-  bool _ngixStatus = false;
 
   @override
   Widget build(BuildContext context) {

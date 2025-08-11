@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:xampp_clone/home.dart';
+import 'home.dart';
 
 void main() async {
     runApp(MainApp());

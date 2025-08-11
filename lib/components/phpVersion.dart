@@ -31,7 +31,7 @@ class _PhpversionState extends State<Phpversion> {
           ),
           Container(
             padding: EdgeInsets.only(bottom: 20),
-            child: Text("php.8.2",style: TextStyle(color: const Color.fromARGB(255, 179, 179, 179)),),
+            child: Text("php.8.4.11",style: TextStyle(color: const Color.fromARGB(255, 179, 179, 179)),),
           )
         ],
       ),
