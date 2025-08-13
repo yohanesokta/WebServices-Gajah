@@ -19,8 +19,10 @@ class _HomeAppState extends State<HomeApp> {
         title: Row(
           spacing: 10,
           children: [
-            Icon(Icons.settings),
-            Text("Control Panels",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w600),)
+            Icon(Icons.home_filled,color: Colors.white,),
+            Text("Control Panel",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w600,color: Colors.white),),
+            Spacer(),
+            IconButton(onPressed: (){}, icon: Icon(Icons.download,color: Colors.white,))
           ],
         ),
       ),

@@ -9,7 +9,6 @@ set "OUTDIR=C:\gajahweb"
 
 mkdir %OUTDIR%
 mkdir %OUTDIR%\htdocs
-
 powershell -command "Expand-Archive -Force 'config.zip' '%OUTDIR%\config\'"
 
 echo "Download Nginx 1.28.0 [1 of 4]"

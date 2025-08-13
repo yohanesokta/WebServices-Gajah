@@ -23,7 +23,7 @@ class _Nginxcontrol extends State<Nginxcontrol> {
   }
 
   Future<void> _startNginx(bool value) async {
-    final webservicePath = r'C:\webservices';
+    final webservicePath = r'C:\gajahweb';
     if (status) {
       await Process.run("$webservicePath\\nginx\\nginx.exe", ["-s","stop"], workingDirectory: "$webservicePath\\nginx");
       await Process.run("taskkill.exe", ["/F","/IM","php-cgi.exe"]);

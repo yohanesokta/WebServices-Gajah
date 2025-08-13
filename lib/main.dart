@@ -11,7 +11,12 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      color: Colors.black,
+      title: "Gajah Webserver",
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(backgroundColor: const Color.fromARGB(255, 18, 18, 18)),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 18, 18, 18)
+      ),
+      debugShowCheckedModeBanner: false,
       home: HomeApp(),
     );
   }

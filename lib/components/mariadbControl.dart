@@ -20,13 +20,13 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
       _isTrigger = true;
     });
     try {
-      final mysqlPath = "C:\\webservices\\mariadb";
+      final mysqlPath = "C:\\gajahweb\\mariadb";
       if (status) {
         killProcess('mysqld.exe');
       } else {
         Process.start(
           "$mysqlPath\\bin\\mysqld.exe",
-          ["--datadir=C:\\webservices\\mariadb\\data", "--console"],
+          ["--datadir=$mysqlPath\\data", "--console"],
           runInShell: true,
           mode: ProcessStartMode.inheritStdio,
         );
