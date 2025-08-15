@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xampp_clone/components/information.dart';
 import 'package:xampp_clone/utils/runtime.dart';
 import '/components/mariadbControl.dart';
 import '/components/nginxControl.dart';
@@ -51,19 +52,35 @@ class _HomeAppState extends State<HomeApp> {
       ),
       body: Container(
         padding: EdgeInsets.all(10),
-        child: Row(
+        child: Column(
           spacing: 10,
-          children: [Nginxcontrol(), Mariadbcontrol(), Rediscontrol()],
+          children: [
+            Row(
+              spacing: 10,
+              children: [Nginxcontrol(), Mariadbcontrol(), Rediscontrol()],
+            ),
+            Information()
+          ],
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Row(
           children: [
-            Text("Build v1.0", style: TextStyle(fontSize:12,color: Colors.white)),
+            Text(
+              "Build v1.0",
+              style: TextStyle(fontSize: 12, color: Colors.white),
+            ),
             Spacer(),
-            Text("Support @yohanesokta", style: TextStyle(fontSize:12,color:  Colors.white)),
-
+            InkWell(
+              child: Row(
+                spacing: 3,
+                children: [
+                  Icon(Icons.info_outline , color: Colors.white,size: 14,),
+                  Text("About",style: TextStyle(fontSize: 12, color: Colors.white),)
+                ],
+              ),
+            ),
           ],
         ),
       ),

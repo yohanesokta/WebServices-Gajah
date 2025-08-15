@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:xampp_clone/utils/terminalContext.dart';
 import 'home.dart';
 
 void main() async {
@@ -7,7 +9,7 @@ void main() async {
     await windowManager.ensureInitialized();
 
     WindowOptions windowOptions = const WindowOptions(
-      size: Size(445, 350),
+      size: Size(445, 355),
       center: true,
       title: "Gajah Webserver",
     );
@@ -19,7 +21,9 @@ void main() async {
       await windowManager.setResizable(false);
     });
 
-    runApp(MainApp());
+    runApp(
+      ChangeNotifierProvider(create: (context) => Terminalcontext(), child: MainApp(),)
+    );
 }
 
 class MainApp extends StatelessWidget {
@@ -36,6 +40,11 @@ class MainApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home: HomeApp(),
+      onGenerateRoute: (settings)  {
+        switch (settings.name) {
+          
+        }
+      },
     );
   }
 }

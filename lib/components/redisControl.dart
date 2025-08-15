@@ -1,9 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'dart:io';
-
+import 'package:provider/provider.dart';
 import 'package:xampp_clone/utils/process.dart';
+import 'package:xampp_clone/utils/terminalContext.dart';
 
 class Rediscontrol extends StatefulWidget {
   const Rediscontrol({super.key});
@@ -15,6 +15,8 @@ class Rediscontrol extends StatefulWidget {
 class _RediscontrolState extends State<Rediscontrol> {
   bool status = false;
   final redisPath = "C:\\gajahweb\\redis";
+    late void terminalAdd;
+ 
 
   void _checkRedisStatus() async {
     bool processStatus = await checkProcess("redis-server.exe");
@@ -23,16 +25,24 @@ class _RediscontrolState extends State<Rediscontrol> {
     });
   }
 
+  @override
+  Future<void> sendTerminal(String message) async {
+     final terminalAdd = Provider.of<Terminalcontext>(context,listen: false).add;
+     terminalAdd(message);
+  }
+
   Future<void> _trigerdRedis(bool value) async {
     if (value) {
       final process = await Process.start(
         "$redisPath\\redis-server.exe",
         [],
         runInShell: false,
-        mode: ProcessStartMode.detached,
+        mode: ProcessStartMode.normal,
         workingDirectory: redisPath,
       );
-      print(process.toString());
+      process.stdout.transform(systemEncoding.decoder).listen((data) {
+        sendTerminal(data);
+      });
       setState(() {
         status = true;
       });
@@ -54,6 +64,7 @@ class _RediscontrolState extends State<Rediscontrol> {
   }
   @override
   Widget build(BuildContext context) {
+  
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       decoration: BoxDecoration(
