@@ -4,12 +4,45 @@ import 'package:flutter/material.dart';
 import '../utils/process.dart';
 import 'dart:io';
 
+
+  Future<bool> showConfirmDialog(BuildContext context, String message) async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Center(child: Text('Tampaknya',style: TextStyle(fontWeight: FontWeight.bold),),),
+          content: Text(message,style: TextStyle(fontSize: 16,),),
+          actions: [
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 20,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Tidak'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text('Ya'),
+                  ),
+                ],
+              ),
+            )
+          ],
+        );
+      },
+    ) ?? false;
+  }
+
 class Mariadbcontrol extends StatefulWidget {
   const Mariadbcontrol({super.key});
 
   @override
   State<Mariadbcontrol> createState() => _MariadbcontrolState();
 }
+
 
 class _MariadbcontrolState extends State<Mariadbcontrol> {
   bool status = false;
@@ -24,11 +57,11 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
       if (status) {
         killProcess('mysqld.exe');
       } else {
-        Process.start(
+        await Process.start(
           "$mysqlPath\\bin\\mysqld.exe",
           ["--datadir=$mysqlPath\\data", "--console"],
-          runInShell: true,
-          mode: ProcessStartMode.inheritStdio,
+          mode: ProcessStartMode.detached,
+          runInShell: false
         );
       }
     } catch (error) {
@@ -37,22 +70,17 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
   }
 
   void _checkMariadbStatus() async {
-    final PortProcess portStatus = await checkPort(3306);
-    if (_isTrigger) {
-      setState(() {
-        _isTrigger =false;
-      });
-    } else {
-      setState(() {
-        status = portStatus.used;
-      });
-    }
+    bool mysqldProcess = await checkProcess('mysqld.exe');
+    if (_isTrigger) { _isTrigger = false; }
+    else   { setState(() {
+      status = mysqldProcess;
+    }); }
   }
 
   @override
   void initState() {
     _checkMariadbStatus();
-    Timer.periodic(Duration(seconds: 5), (timer) {
+    Timer.periodic(Duration(seconds: 2), (timer) {
       _checkMariadbStatus();
     });
     super.initState();
@@ -79,7 +107,7 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
         children: [
           Image(image: AssetImage("assets/mysqld.png"), width: 32, height: 32),
           Text(
-            "Mysql Server",
+            "Mariadb Server",
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,

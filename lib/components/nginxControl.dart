@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:io';
-
 import 'package:xampp_clone/utils/process.dart';
 
 class Nginxcontrol extends StatefulWidget {
@@ -14,12 +14,10 @@ class _Nginxcontrol extends State<Nginxcontrol> {
   bool status = false;
 
   void _checkNginxStatus() async {
-    final bool nginxIsRun = await checkProcess('nginx.exe');
-    if (nginxIsRun) {
-      setState(() {
-        status = true;
-      });
-    }
+    bool nginxIsRun = await checkProcess('nginx.exe');
+    setState(() {
+      status = nginxIsRun;
+    });
   }
 
   Future<void> _startNginx(bool value) async {
@@ -28,8 +26,8 @@ class _Nginxcontrol extends State<Nginxcontrol> {
       await Process.run("$webservicePath\\nginx\\nginx.exe", ["-s","stop"], workingDirectory: "$webservicePath\\nginx");
       await Process.run("taskkill.exe", ["/F","/IM","php-cgi.exe"]);
     } else {
-      await Process.start("$webservicePath\\nginx\\nginx.exe", ["-p","$webservicePath\\nginx"], mode: ProcessStartMode.inheritStdio);
-      await Process.start("$webservicePath\\php-8.4\\php-cgi.exe",["-b","127.0.0.1:9000"],mode: ProcessStartMode.inheritStdio);
+      await Process.start("$webservicePath\\nginx\\nginx.exe", ["-p","$webservicePath\\nginx"], mode: ProcessStartMode.detached,runInShell: false);
+      await Process.start("$webservicePath\\php-8.4\\php-cgi.exe",["-b","127.0.0.1:9000"],mode: ProcessStartMode.detached,runInShell: false);
     }
     setState(() {
       status = value;
@@ -39,6 +37,9 @@ class _Nginxcontrol extends State<Nginxcontrol> {
   @override
   void initState() {
     _checkNginxStatus();
+    Timer.periodic(Duration(seconds: 2), (timer) {
+      _checkNginxStatus();
+    });
     super.initState();
   }
 

@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
 import 'home.dart';
 
 void main() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await windowManager.ensureInitialized();
+
+    WindowOptions windowOptions = const WindowOptions(
+      size: Size(445, 350),
+      center: true,
+      title: "Gajah Webserver",
+    );
+
+    windowManager.waitUntilReadyToShow(windowOptions,() async {
+      await windowManager.show();
+      await windowManager.focus();
+      await windowManager.setMaximizable(false);
+      await windowManager.setResizable(false);
+    });
+
     runApp(MainApp());
 }
 
@@ -10,6 +27,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: "Gajah Webserver",
       theme: ThemeData(
