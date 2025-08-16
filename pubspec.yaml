@@ -69,6 +69,7 @@ flutter:
     - resource/config.zip
     - resource/wget.exe
     - setup.bat
+    - php-change-v.bat
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

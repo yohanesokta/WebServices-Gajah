@@ -15,7 +15,7 @@ class Phpversion {
 Future<List<Phpversion>?> getDataVersion() async {
   try {
     var response = await http.get(
-      Uri.parse("http://localhost:8080/api/php-archive.json"),
+      Uri.parse("https://yohanesokta.github.io/WebServices-Gajah/api/php-archive.json"),
     );
     if (response.statusCode != 200) {
       print("archive version get failed");

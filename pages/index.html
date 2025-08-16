@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gajah Webserver - Server Lokal Super Cepat untuk Developer Modern</title>
+    <meta name="description" content="Gajah Webserver adalah lingkungan pengembangan lokal untuk Windows yang ringan, bertenaga, dan siap pakai, mencakup Nginx, Multi-PHP, MariaDB, Redis, dan integrasi Flutter.">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
+
+        :root {
+            --bg-color: #0D1117;
+            --bg-secondary: #161B22;
+            --border-color: #30363D;
+            --text-primary: #C9D1D9;
+            --text-secondary: #8B949E;
+            --primary-color: #58A6FF;
+            --primary-hover: #79C0FF;
+            --header-font-weight: 800;
+            --section-spacing: 6rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: var(--section-spacing) 0;
+        }
+
+        h1, h2, h3 {
+            color: var(--text-primary);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h2.section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 8rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: var(--header-font-weight);
+            margin-bottom: 1rem;
+        }
+        
+        .hero h1 span {
+            font-size: 4rem;
+            vertical-align: middle;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2.5rem auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border-color: var(--border-color);
+        }
+        .btn-secondary:hover {
+            background-color: var(--bg-secondary);
+            border-color: var(--primary-color);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .feature-card .icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        #why {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+        
+        .why-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .why-card p {
+            color: var(--text-secondary);
+        }
+
+        .steps-container {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .step h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .step p {
+            color: var(--text-secondary);
+        }
+        
+        .step::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border: 4px solid var(--bg-color);
+        }
+        
+        body {
+            counter-reset: step-counter;
+        }
+        .community-section {
+            text-align: center;
+        }
+        
+        .community-section p {
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+            color: var(--text-secondary);
+        }
+        
+        footer {
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+        
+        footer a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+             .hero h1 span {
+                font-size: 3rem;
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+            .steps-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Gajah Webserver <span>🐘</span></h1>
+            <p>Server Lokal Super Cepat untuk Developer Modern. Setup Nginx, Multi-PHP, MariaDB, dan Redis dengan satu klik. Ringan, bertenaga, dan siap untuk proyek masa depan Anda.</p>
+            <div class="hero-buttons">
+                <a href="https://github.com/yohanesokta/WebServices-Gajah/releases" class="btn btn-primary">Unduh Versi Terbaru</a>
+                <a href="https://github.com/yohanesokta/WebServices-Gajah" class="btn btn-secondary">Lihat di GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="features" class="container" style="padding: 50px 0;">
+            <h2 class="section-title">Fitur Andalan ✨</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                    <h3>Nginx</h3>
+                    <p>Rasakan kecepatan web server berkinerja tinggi yang stabil dan efisien dalam mengelola sumber daya.</p>
+                </div>
+                <div class="feature-card">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>
+                    <h3>Multi-PHP Lengkap</h3>
+                    <p>Ganti versi PHP dengan satu perintah! Dari PHP 5.2 hingga 8.4 terbaru. Sempurna untuk menguji kompatibilitas.</p>
+                </div>
+                <div class="feature-card">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75" /></svg>
+                    <h3>MariaDB (MySQL)</h3>
+                    <p>Database relasional yang kuat, cepat, dan kompatibel sepenuhnya dengan semua proyek MySQL Anda.</p>
+                </div>
+                <div class="feature-card">
+                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" /></svg>
+                    <h3>Redis Ready</h3>
+                    <p>Manfaatkan in-memory data store super cepat untuk caching, manajemen sesi, dan antrian yang efisien.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.82m5.84-2.56a17.96 17.96 0 0 0-5.84-2.56m0 0a17.96 17.96 0 0 0-5.84 2.56m5.84-2.56V4.72a6 6 0 0 1 12 0v2.65M15.59 14.37A17.96 17.96 0 0 1 21.72 12m-6.13 2.37a17.96 17.96 0 0 0-5.84 2.56m5.84-2.56a17.96 17.96 0 0 0 5.84-2.56m0 0a6 6 0 0 1-12 0" /></svg>
+                    <h3>Setup Satu Klik</h3>
+                    <p>Cukup jalankan Aplikasi dan biarkan skrip kami melakukan semua konfigurasi rumit untuk Anda.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="why">
+            <div class="container">
+                <h2 class="section-title">Kenapa Memilih Gajah Webserver? 🤔</h2>
+                <div class="why-grid">
+                    <div class="why-card">
+                        <h3>Kecepatan Kilat 💨</h3>
+                        <p>Dibangun di atas Nginx, Gajah Webserver memberikan performa maksimal untuk aplikasi Anda, jauh lebih responsif dibandingkan solusi tradisional.</p>
+                    </div>
+                    <div class="why-card">
+                        <h3>Modern & Fleksibel 🛠️</h3>
+                        <p>Dengan PHP versi terbaru, Redis bawaan, dan kemudahan mengganti versi PHP, Anda selalu berada di garis depan teknologi.</p>
+                    </div>
+                    <div class="why-card">
+                        <h3>Fokus pada Flutter 🎯</h3>
+                        <p>Sempurnakan alur kerja pengembangan web dan desktop Anda dengan integrasi Flutter yang mulus dan siap pakai.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="getting-started" class="container" style="padding: 50px 0;">
+            <h2 class="section-title">Mulai dalam 3 Langkah Mudah 🏁</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <h3>1. Unduh & Ekstrak</h3>
+                    <p>Dapatkan paket terbaru dari repositori GitHub kami dan ekstrak di mana saja Anda suka.</p>
+                </div>
+                <div class="step">
+                    <h3>2. Jalankan Setup</h3>
+                    <p>Klik dua kali aplikasi. Skrip cerdas kami akan menyiapkan semua layanan secara otomatis.</p>
+                </div>
+                <div class="step">
+                    <h3>3. Mulai Coding!</h3>
+                    <p>Letakkan proyek PHP Anda di folder `www` atau jalankan `flutter run` dari terminal. Selesai!</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="community" class="container community-section">
+             <h2 class="section-title">Dibangun oleh Komunitas ❤️</h2>
+             <p>Gajah Webserver adalah proyek open-source. Punya ide brilian, menemukan bug, atau ingin menambahkan fitur baru? Kami menyambut kontribusi Anda dengan tangan terbuka!</p>
+             <a href="#" class="btn btn-primary">Bergabung di GitHub</a>
+        </section>
+
+    </main>
+
+    <footer style="margin: 50px 0;">
+        <div class="container">
+            <p>&copy; 2025 Gajah Webserver. Dilisensikan di bawah MIT License.</p>
+            <p>
+                <a href="https://github.com/yohanesokta/WebServices-Gajah/issues">Dokumentasi</a> &bull;
+                <a href="https://github.com/yohanesokta/WebServices-Gajah">Laporkan Bug</a>
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

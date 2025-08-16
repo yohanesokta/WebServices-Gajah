@@ -1,0 +1,77 @@
+[
+    {
+        "name": "php-8.4",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-8.4.11-Win32-vs17-x64.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-8.3",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-8.3.4-Win32-vs16-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-8.2",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-8.2.21-Win32-vs16-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-8.1",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-8.1.29-nts-Win32-vs16-x64.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-8.0",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-8.0.30-Win32-vs16-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-7.4",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-7.4.33-Win32-vc15-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-7.4",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-7.4.33-Win32-vc15-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-7.2",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-7.2.34-Win32-VC15-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-7.1",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-7.1.33-Win32-VC14-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-7.0",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-7.0.33-Win32-VC14-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-5.6",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-5.6.40-Win32-VC11-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-5.5",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-5.5.38-Win32-VC11-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-5.4",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-5.4.45-Win32-VC9-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-5.3",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-5.3.29-Win32-VC9-x86.zip",
+        "type": "universal"
+    },
+    {
+        "name": "php-5.2",
+        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-5.2.17-Win32-VC6-x86.zip",
+        "type": "legacy"
+    }
+]

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xampp_clone/model/phpVersion.dart';
+import 'dart:io';
 
 class Download extends StatefulWidget {
   const Download({super.key});
@@ -10,6 +11,26 @@ class Download extends StatefulWidget {
 
 class _DownloadState extends State<Download> {
   final ScrollController _scrollController = ScrollController();
+
+  Future<void> _changePHPVersion(String name, String url, int index) async {
+    try {
+    final String configDir = "C:\\gajahweb\\data\\flutter_assets";
+    final String configType = (index > 834) ? "legacy" : "universal";
+    final process = await Process.start(
+      "cmd.exe",
+      ['/c', '$configDir\\php-change-v.bat', name, url, configType],
+      mode: ProcessStartMode.detached,
+      runInShell: true,
+      workingDirectory: configDir
+    );
+
+    process.stdout.transform(systemEncoding.decoder).listen((data) {
+        print(data.toString());
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +52,7 @@ class _DownloadState extends State<Download> {
                   controller: _scrollController,
                   itemCount: data.data!.length,
                   itemBuilder: (context, index) {
+                    final versionData = data.data![index];
                     return Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 20,
@@ -48,7 +70,7 @@ class _DownloadState extends State<Download> {
                         child: Row(
                           children: [
                             Text(
-                              data.data![index].name,
+                              versionData.name,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal,
@@ -56,13 +78,15 @@ class _DownloadState extends State<Download> {
                             ),
                             Spacer(),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                _changePHPVersion(versionData.name, versionData.url, index);
+                              },
                               child: Text(
                                 "change",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
-                                  fontWeight: FontWeight.w400
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ),
