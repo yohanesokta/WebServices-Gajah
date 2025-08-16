@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xampp_clone/model/phpVersion.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
 class Download extends StatefulWidget {
@@ -11,14 +12,14 @@ class Download extends StatefulWidget {
 
 class _DownloadState extends State<Download> {
   final ScrollController _scrollController = ScrollController();
+  bool isStable = false;
 
-  Future<void> _changePHPVersion(String name, String url, int index) async {
+  Future<void> _changePHPVersion(String name, String url, String type) async {
     try {
     final String configDir = "C:\\gajahweb\\data\\flutter_assets";
-    final String configType = (index > 834) ? "legacy" : "universal";
     final process = await Process.start(
       "cmd.exe",
-      ['/c', '$configDir\\php-change-v.bat', name, url, configType],
+      ['/c', '$configDir\\php-change-v.bat', name, url, type],
       mode: ProcessStartMode.detached,
       runInShell: true,
       workingDirectory: configDir
@@ -32,13 +33,37 @@ class _DownloadState extends State<Download> {
     }
   }
 
+  void _loadStableStatus() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      isStable = preferences.getBool("isStable") ?? false;
+    });
+  }
+
+  void _changeStable(bool status) async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setBool('isStable',status);
+    setState(() {
+      isStable = status;
+    });
+  }
+
+  @override
+  void initState() {
+    _loadStableStatus();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Download PHP Version")),
+      appBar: AppBar(
+        title: Row(
+          children: [Text("Download PHP Version"), Spacer(), Text("Stable"), Checkbox(value: isStable, onChanged: (value) {_changeStable(value!);})],
+        )
+      ),
       body: Container(
         child: FutureBuilder<List<Phpversion>?>(
-          future: getDataVersion(),
+          future: getDataVersion(isStable),
           builder: (context, data) {
             if (data.connectionState == ConnectionState.waiting) {
               return Center(
@@ -78,8 +103,8 @@ class _DownloadState extends State<Download> {
                             ),
                             Spacer(),
                             TextButton(
-                              onPressed: () {
-                                _changePHPVersion(versionData.name, versionData.url, index);
+                              onPressed: () async {
+                                await _changePHPVersion(versionData.name, versionData.url, versionData.type);
                               },
                               child: Text(
                                 "change",

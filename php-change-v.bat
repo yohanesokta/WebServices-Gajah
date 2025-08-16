@@ -13,7 +13,8 @@ if exist "%filePath%\%1.zip" (
     echo fileFound : %filePath%\%1.zip
     goto replace
 ) else (
-    wget.exe %2 -O %filePath%\%1.zip
+    wget.exe %2 -O %filePath%\%1.source
+    move %filePath%\%1.source %filePath%\%1.zip
 )
 
 :replace
