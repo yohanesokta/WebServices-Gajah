@@ -9,5 +9,4 @@ class Terminalcontext with ChangeNotifier {
     _message.add(text);
     notifyListeners();
   }
-
 } 
