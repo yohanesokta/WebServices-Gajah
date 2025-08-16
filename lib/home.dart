@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:xampp_clone/components/information.dart';
-import 'package:xampp_clone/model/phpVersion.dart';
 import 'package:xampp_clone/utils/runtime.dart';
 import '/components/mariadbControl.dart';
 import '/components/nginxControl.dart';
@@ -17,7 +16,6 @@ class _HomeAppState extends State<HomeApp> {
   @override
   void initState() {
     getConfig();
-    getDataVersion();
     super.initState();
   }
 
