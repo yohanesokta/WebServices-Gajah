@@ -73,6 +73,9 @@ class _HomeAppState extends State<HomeApp> {
             ),
             Spacer(),
             InkWell(
+              onTap: () {
+                Navigator.pushNamed(context, "/about");
+              },
               child: Row(
                 spacing: 3,
                 children: [

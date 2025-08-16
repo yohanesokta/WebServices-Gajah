@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:xampp_clone/components/part/about.dart';
+import 'package:xampp_clone/utils/slideLeftRoute.dart';
 import 'package:xampp_clone/utils/terminalContext.dart';
 import 'home.dart';
 
@@ -35,15 +37,18 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: "Gajah Webserver",
       theme: ThemeData(
-        appBarTheme: AppBarTheme(backgroundColor: const Color.fromARGB(255, 18, 18, 18)),
+        appBarTheme: AppBarTheme(backgroundColor: const Color.fromARGB(255, 18, 18, 18),titleTextStyle: TextStyle(color: Colors.white),foregroundColor: Colors.white),
         scaffoldBackgroundColor: const Color.fromARGB(255, 18, 18, 18)
+      
       ),
       debugShowCheckedModeBanner: false,
       home: HomeApp(),
       onGenerateRoute: (settings)  {
         switch (settings.name) {
-          
+          case "/about" :
+            return SlideLeftRoute(page: AboutPage());
         }
+        return null;
       },
     );
   }

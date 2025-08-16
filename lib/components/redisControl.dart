@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:xampp_clone/utils/process.dart';
@@ -15,8 +16,7 @@ class Rediscontrol extends StatefulWidget {
 class _RediscontrolState extends State<Rediscontrol> {
   bool status = false;
   final redisPath = "C:\\gajahweb\\redis";
-    late void terminalAdd;
- 
+  late void terminalAdd;
 
   void _checkRedisStatus() async {
     bool processStatus = await checkProcess("redis-server.exe");
@@ -27,8 +27,11 @@ class _RediscontrolState extends State<Rediscontrol> {
 
   @override
   Future<void> sendTerminal(String message) async {
-     final terminalAdd = Provider.of<Terminalcontext>(context,listen: false).add;
-     terminalAdd(message);
+    final terminalAdd = Provider.of<Terminalcontext>(
+      context,
+      listen: false,
+    ).add;
+    terminalAdd(message);
   }
 
   Future<void> _trigerdRedis(bool value) async {
@@ -48,6 +51,9 @@ class _RediscontrolState extends State<Rediscontrol> {
       });
     } else {
       await killProcess("redis-server.exe");
+      sendTerminal(
+        "Menghentikan Proses [redis-server.exe]\nBerhasil Dilakukan!",
+      );
       setState(() {
         status = false;
       });
@@ -62,38 +68,70 @@ class _RediscontrolState extends State<Rediscontrol> {
     });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-  
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 47, 29, 122),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 10,
-        children: [
-          Image(image: AssetImage("assets/redis.png"), width: 32, height: 32),
-          Text(
-            "Redis Server",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 47, 29, 122),
+            borderRadius: BorderRadius.circular(8),
           ),
-          Switch(
-            activeColor: const Color.fromARGB(255, 14, 175, 9),
-            value: status,
-            onChanged: (value) {
-              _trigerdRedis(value);
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 10,
+            children: [
+              Image(
+                image: AssetImage("assets/redis.png"),
+                width: 32,
+                height: 32,
+              ),
+              Text(
+                "Redis Server",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              Switch(
+                activeColor: const Color.fromARGB(255, 14, 175, 9),
+                value: status,
+                onChanged: (value) {
+                  _trigerdRedis(value);
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+
+        (status)
+            ? Positioned(
+                top: 5,
+                right: 5,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    color: const Color.fromARGB(69, 255, 255, 255),
+                  ),
+                  padding: EdgeInsets.all(7),
+                  child: InkWell(
+                    onTap: () async {
+                      String pathRedis = "C:\\gajahweb\\redis";
+                      await Process.start("cmd.exe", ["/c","start","redis-cli.exe"],workingDirectory: pathRedis,runInShell: true,mode: ProcessStartMode.detached);
+                    },
+                    child: Icon(
+                      FontAwesomeIcons.play,
+                      size: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )
+            : Container(),
+      ],
     );
-    ;
   }
 }

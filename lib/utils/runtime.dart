@@ -1,5 +1,4 @@
 import "dart:io";
-import "package:path_provider/path_provider.dart";
 
 Future <void> getConfig() async {
     final String filePath = "C:\\gajahweb\\config.log";

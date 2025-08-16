@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Terminalcontext with ChangeNotifier {
-  List<String> _message = [];
+  final List<String> _message = [];
 
   List<String> get terminalContext => _message;
 
