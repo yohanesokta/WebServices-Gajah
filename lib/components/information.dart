@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:xampp_clone/utils/terminalContext.dart';
+import 'package:gajahweb/utils/terminalContext.dart';
 
 class Information extends StatefulWidget {
   const Information({super.key});

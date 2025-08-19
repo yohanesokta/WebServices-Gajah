@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:xampp_clone/utils/terminalContext.dart';
+import 'package:gajahweb/utils/terminalContext.dart';
 import '../utils/process.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
@@ -166,7 +167,9 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
                   padding: EdgeInsets.all(7),
                   child: InkWell(
                     onTap: () async {
-                      final Uri url = Uri.parse("http://localhost/phpmyadmin");
+                      final SharedPreferences preferences = await SharedPreferences.getInstance();
+                      String port = preferences.getString("nginxPort") ?? "80";
+                      final Uri url = Uri.parse("http://localhost:$port/phpmyadmin");
                       await launchUrl(url);
                     },
                     child: Icon(

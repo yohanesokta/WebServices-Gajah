@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:xampp_clone/components/part/about.dart';
-import 'package:xampp_clone/components/part/download.dart';
-import 'package:xampp_clone/components/part/settings.dart';
-import 'package:xampp_clone/utils/slideLeftRoute.dart';
-import 'package:xampp_clone/utils/terminalContext.dart';
+import 'package:gajahweb/components/part/about.dart';
+import 'package:gajahweb/components/part/download.dart';
+import 'package:gajahweb/components/part/settings.dart';
+import 'package:gajahweb/utils/slideLeftRoute.dart';
+import 'package:gajahweb/utils/terminalContext.dart';
 import 'home.dart';
 
 void main() async {

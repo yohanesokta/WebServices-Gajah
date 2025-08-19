@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:xampp_clone/utils/process.dart';
+import 'package:gajahweb/utils/process.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});

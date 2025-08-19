@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
-import 'package:xampp_clone/utils/process.dart';
-import 'package:xampp_clone/utils/terminalContext.dart';
+import 'package:gajahweb/utils/process.dart';
+import 'package:gajahweb/utils/terminalContext.dart';
 
 class Rediscontrol extends StatefulWidget {
   const Rediscontrol({super.key});

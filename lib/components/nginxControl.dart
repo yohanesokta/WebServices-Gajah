@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
-import 'package:xampp_clone/utils/process.dart';
+import 'package:gajahweb/utils/process.dart';
 import 'package:provider/provider.dart';
-import 'package:xampp_clone/utils/terminalContext.dart';
+import 'package:gajahweb/utils/terminalContext.dart';
 
 class Nginxcontrol extends StatefulWidget {
   const Nginxcontrol({super.key});
@@ -34,6 +35,8 @@ class _Nginxcontrol extends State<Nginxcontrol> {
   }
 
   Future<void> _startNginx(bool value) async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    String port = preferences.getString("nginxPort") ?? "80";
     final webservicePath = r'C:\gajahweb';
     if (status) {
       await Process.run(
@@ -41,6 +44,7 @@ class _Nginxcontrol extends State<Nginxcontrol> {
         ["-s", "stop"],
         workingDirectory: "$webservicePath\\nginx",
       );
+      await Process.run("taskkill.exe", ["/F", "/IM", "nginx.exe"]);
       await Process.run("taskkill.exe", ["/F", "/IM", "php-cgi.exe"]);
       sendTerminal("Menghentikan Proses [nginx.exe, php-cgi.exe]\nBerhasil!");
     } else {
@@ -56,7 +60,7 @@ class _Nginxcontrol extends State<Nginxcontrol> {
         mode: ProcessStartMode.normal,
         runInShell: false,
       );
-      sendTerminal("Memulai Nginx :80\nMemulai php-cgi.exe :9000\nBerhasil!");
+      sendTerminal("Memulai Nginx :$port\nMemulai php-cgi.exe :9000\nBerhasil!");
     }
     setState(() {
       status = value;
@@ -131,7 +135,9 @@ class _Nginxcontrol extends State<Nginxcontrol> {
                   padding: EdgeInsets.all(7),
                   child: InkWell(
                     onTap: () async {
-                      final Uri url = Uri.parse("http://localhost");
+                      final SharedPreferences preferences = await SharedPreferences.getInstance();
+                      String port = preferences.getString("nginxPort") ?? "80";
+                      final Uri url = Uri.parse("http://localhost:$port");
                       await launchUrl(url);
                     },
                     child: Icon(

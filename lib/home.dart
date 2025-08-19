@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:xampp_clone/components/information.dart';
-import 'package:xampp_clone/utils/process.dart';
-import 'package:xampp_clone/utils/runtime.dart';
+import 'package:gajahweb/components/information.dart';
+import 'package:gajahweb/utils/process.dart';
+import 'package:gajahweb/utils/runtime.dart';
 import '/components/mariadbControl.dart';
 import '/components/nginxControl.dart';
 import 'components/redisControl.dart';
@@ -121,7 +121,7 @@ class _HomeAppState extends State<HomeApp> {
         child: Row(
           children: [
             Text(
-              "Build v1.0",
+              "Build v1.2",
               style: TextStyle(fontSize: 12, color: Colors.white),
             ),
             Spacer(),
