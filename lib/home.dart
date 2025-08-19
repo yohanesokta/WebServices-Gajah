@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xampp_clone/components/information.dart';
+import 'package:xampp_clone/utils/process.dart';
 import 'package:xampp_clone/utils/runtime.dart';
 import '/components/mariadbControl.dart';
 import '/components/nginxControl.dart';
@@ -63,7 +64,55 @@ class _HomeAppState extends State<HomeApp> {
               spacing: 10,
               children: [Nginxcontrol(), Mariadbcontrol(), Rediscontrol()],
             ),
-            Information()
+            Information(),
+
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 10,
+              children: [
+                InkWell(
+                  onTap: () {
+                   StartProgram("C:\\gajahweb\\heidisql\\heidisql.exe", []);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 199, 129, 0),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Row(
+                      spacing: 5,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.storage, color: const Color.fromARGB(255, 255, 255, 255)),
+                        Text("HeidiSQL", style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                   StartProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\"]);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 133, 133, 133),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Row(
+                      spacing: 5,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.folder, color: Colors.amber),
+                        Text("htdocs", style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

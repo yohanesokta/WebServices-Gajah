@@ -12,6 +12,14 @@ Future<bool> checkProcess(String nameProcess) async {
   }
 } 
 
+Future<void> StartProgram(String path, List<String> arguments) async {
+  try {
+    await Process.start(path,arguments,mode: ProcessStartMode.detached,runInShell: false);
+  } catch (err) {
+    print(err);
+  }
+}
+
 Future<bool> killProcess(String nameProcess) async {
   try {
     final result = await Process.run('taskkill.exe', ["/F","/IM",nameProcess],runInShell: true);

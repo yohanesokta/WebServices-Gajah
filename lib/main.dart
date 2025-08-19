@@ -13,7 +13,7 @@ void main() async {
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = const WindowOptions(
-    size: Size(445, 355),
+    size: Size(445, 400),
     center: true,
     title: "Gajah Webserver",
   );

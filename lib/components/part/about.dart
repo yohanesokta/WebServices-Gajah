@@ -16,9 +16,9 @@ class _AboutPageState extends State<AboutPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18.0,vertical: 20),
           child: Text(
-                "Dibuat dengan semangat oleh Yohanes Oktanio\n"
+                "Dibuat dengan semangat oleh @yohanesokta\n"
                 "Proyek ini menyediakan paket web server lengkap untuk pengembangan lokal, "
-                "termasuk Nginx, PHP 8.4, dan MariaDB, terintegrasi dengan Flutter.",
+                "termasuk Nginx, PHP latest^, dan MariaDB.",
                 style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,)
           ),

@@ -8,6 +8,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white) ![Visual Studio](https://img.shields.io/badge/Visual%20Studio-5C2D91.svg?style=for-the-badge&logo=visual-studio&logoColor=white) ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)	![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white) ![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)  	![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
 </div>
+
 Selamat datang di **Gajah Webserver** Proyek ini menyediakan paket web server yang mudah digunakan untuk pengembangan lokal, yang mencakup Nginx, PHP 8.4, dan MariaDB (MySQL). Proyek ini juga terintegrasi dengan Flutter untuk pengembangan aplikasi web dan desktop.
 
 ## ✨ Fitur Unggulan
