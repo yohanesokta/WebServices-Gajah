@@ -69,6 +69,8 @@ flutter:
     - assets/
     - resource/config.zip
     - resource/wget.exe
+    - resource/mariadb-port.bat
+    - resource/nginx-port.bat
     - setup.bat
     - php-change-v.bat
   #   - images/a_dot_ham.jpeg

@@ -30,11 +30,6 @@
         "type": "universal"
     },
     {
-        "name": "php-7.4",
-        "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-7.4.33-Win32-vc15-x86.zip",
-        "type": "universal"
-    },
-    {
         "name": "php-7.2",
         "url": "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-7.2.34-Win32-VC15-x86.zip",
         "type": "universal"
