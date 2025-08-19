@@ -46,7 +46,9 @@ class _HomeAppState extends State<HomeApp> {
               ),
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, "/settings");
+              },
               icon: Icon(Icons.settings, color: Colors.white),
             ),
           ],

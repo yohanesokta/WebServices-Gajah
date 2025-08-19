@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:xampp_clone/components/part/about.dart';
 import 'package:xampp_clone/components/part/download.dart';
+import 'package:xampp_clone/components/part/settings.dart';
 import 'package:xampp_clone/utils/slideLeftRoute.dart';
 import 'package:xampp_clone/utils/terminalContext.dart';
 import 'home.dart';
@@ -64,6 +65,8 @@ class MainApp extends StatelessWidget {
             return SlideLeftRoute(page: AboutPage());
           case "/download":
             return SlideLeftRoute(page: Download());
+          case "/settings":
+            return SlideLeftRoute(page: Settings());
         }
         return null;
       },
