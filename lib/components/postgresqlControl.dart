@@ -6,14 +6,14 @@ import 'package:provider/provider.dart';
 import 'package:gajahweb/utils/process.dart';
 import 'package:gajahweb/utils/terminalContext.dart';
 
-class Rediscontrol extends StatefulWidget {
-  const Rediscontrol({super.key});
+class Postgresqlcontrol extends StatefulWidget {
+  const Postgresqlcontrol({super.key});
 
   @override
-  State<Rediscontrol> createState() => _RediscontrolState();
+  State<Postgresqlcontrol> createState() => _PostgresqlcontrolState();
 }
 
-class _RediscontrolState extends State<Rediscontrol> {
+class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
   bool status = false;
   final redisPath = "C:\\gajahweb\\redis";
   late void terminalAdd;
@@ -80,16 +80,15 @@ class _RediscontrolState extends State<Rediscontrol> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             spacing: 10,
             children: [
               Image(
-                image: AssetImage("assets/redis.png"),
+                image: AssetImage("assets/postgre.png"),
                 width: 32,
                 height: 32,
               ),
               Text(
-                "Redis Server",
+                "Postgresql",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

@@ -22,7 +22,8 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _nginxPort.text = preferences.getString("nginxPort") ?? "80";
       _mariadbPort.text = preferences.getString("mariadbPort") ?? "3306";
-      _postgresqlPort.text = preferences.getString("postgresqlPort") ?? "Belum Tersedia";
+      _postgresqlPort.text =
+          preferences.getString("postgresqlPort") ?? "Belum Tersedia";
     });
   }
 
@@ -60,7 +61,12 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _openFilesNotepad(String filePath) async {
-    await Process.start("notepad.exe", ["C:\\gajahweb\\$filePath"],mode: ProcessStartMode.detached,runInShell: false);
+    await Process.start(
+      "notepad.exe",
+      ["C:\\gajahweb\\$filePath"],
+      mode: ProcessStartMode.detached,
+      runInShell: false,
+    );
   }
 
   @override
@@ -160,7 +166,7 @@ class _SettingsState extends State<Settings> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 133, 133, 133),
+                      color: const Color.fromARGB(255, 51, 51, 51),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Row(
@@ -180,7 +186,7 @@ class _SettingsState extends State<Settings> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 133, 133, 133),
+                      color: const Color.fromARGB(255, 51, 51, 51),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Row(
@@ -188,7 +194,10 @@ class _SettingsState extends State<Settings> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.file_open, color: Colors.amber),
-                        Text("nginx.conf", style: TextStyle(color: Colors.white)),
+                        Text(
+                          "nginx.conf",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ],
                     ),
                   ),
@@ -200,7 +209,7 @@ class _SettingsState extends State<Settings> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 133, 133, 133),
+                      color: const Color.fromARGB(255, 51, 51, 51),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Row(

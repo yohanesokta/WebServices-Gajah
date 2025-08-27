@@ -90,10 +90,25 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
   }
 
   void _checkMariadbStatus() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    String mariadb = preferences.getString("mariadbPort") ?? "3306";
+
     bool mysqldProcess = await checkProcess('mysqld.exe');
     if (_isTrigger) {
       _isTrigger = false;
     } else {
+      bool checkActive = await checkPort(mariadb);
+      if (checkActive) {
+        if (mysqldProcess) {
+          await showConfirmDialog(
+            context,
+            "Alamak Port Digunakan Padahal aplikasi belum di start!.",
+          );
+          await killProcess("mysqld.exe");
+          return;
+        }
+      }
+
       setState(() {
         status = mysqldProcess;
       });
@@ -167,9 +182,12 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
                   padding: EdgeInsets.all(7),
                   child: InkWell(
                     onTap: () async {
-                      final SharedPreferences preferences = await SharedPreferences.getInstance();
+                      final SharedPreferences preferences =
+                          await SharedPreferences.getInstance();
                       String port = preferences.getString("nginxPort") ?? "80";
-                      final Uri url = Uri.parse("http://localhost:$port/phpmyadmin");
+                      final Uri url = Uri.parse(
+                        "http://localhost:$port/phpmyadmin",
+                      );
                       await launchUrl(url);
                     },
                     child: Icon(
