@@ -1,6 +1,5 @@
 import "dart:io";
 
-
 Future<bool> checkProcess(String nameProcess) async {
   try {
     final result = await Process.run('tasklist', [], runInShell: true);
@@ -10,11 +9,16 @@ Future<bool> checkProcess(String nameProcess) async {
     print(error.toString());
     return false;
   }
-} 
+}
 
 Future<void> StartProgram(String path, List<String> arguments) async {
   try {
-    await Process.start(path,arguments,mode: ProcessStartMode.detached,runInShell: false);
+    await Process.start(
+      path,
+      arguments,
+      mode: ProcessStartMode.detached,
+      runInShell: false,
+    );
   } catch (err) {
     print(err);
   }
@@ -22,7 +26,11 @@ Future<void> StartProgram(String path, List<String> arguments) async {
 
 Future<bool> killProcess(String nameProcess) async {
   try {
-    final result = await Process.run('taskkill.exe', ["/F","/IM",nameProcess],runInShell: true);
+    final result = await Process.run('taskkill.exe', [
+      "/F",
+      "/IM",
+      nameProcess,
+    ], runInShell: true);
     final output = result.stdout.toString();
     return output.isNotEmpty;
   } catch (error) {
@@ -31,19 +39,15 @@ Future<bool> killProcess(String nameProcess) async {
   }
 }
 
-class PortProcess {
-    String logs;
-    bool used;
-    PortProcess(this.logs,this.used);
-}
-
-Future<PortProcess> checkPort(int port) async {
+Future<bool> checkPort(String port) async {
   try {
-    final result = await Process.run("netstat", ["-ano","|","findstr",":$port"] ,runInShell: true);
-    final output = result.stdout.toString();
-    return PortProcess(output, output.isNotEmpty);
-  } catch(error) {
-    print(error);
-    return PortProcess("", false);
+    final server = await ServerSocket.bind(
+      InternetAddress.anyIPv4,
+      int.parse(port),
+    );
+    await server.close();
+    return true;
+  } on SocketException {
+    return false;
   }
 }

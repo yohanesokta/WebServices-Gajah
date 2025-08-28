@@ -6,7 +6,7 @@ set ROOTDIR=C:\gajahweb
 set TEMPLATE=%ROOTDIR%\config\nginx.conf.template
 set OUTPUT=%ROOTDIR%\nginx\conf\nginx.conf
 
-powershell -command "Expand-Archive -Force 'config.zip' '%ROOTDIR%\config\'"
+unzip.exe -o config.zip -d %ROOTDIR%\config\
 echo Membuat config dengan port %PORT% ...
 
 (
@@ -17,5 +17,6 @@ for /f "usebackq delims=" %%A in ("%TEMPLATE%") do (
 )
 ) > "%OUTPUT%"
 
+rmdir /s /q %ROOTDIR%\config
 echo Selesai! nginx.conf digenerate pakai port %PORT%.
 endlocal

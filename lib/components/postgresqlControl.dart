@@ -6,20 +6,20 @@ import 'package:provider/provider.dart';
 import 'package:gajahweb/utils/process.dart';
 import 'package:gajahweb/utils/terminalContext.dart';
 
-class Rediscontrol extends StatefulWidget {
-  const Rediscontrol({super.key});
+class Postgresqlcontrol extends StatefulWidget {
+  const Postgresqlcontrol({super.key});
 
   @override
-  State<Rediscontrol> createState() => _RediscontrolState();
+  State<Postgresqlcontrol> createState() => _PostgresqlcontrolState();
 }
 
-class _RediscontrolState extends State<Rediscontrol> {
+class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
   bool status = false;
-  final redisPath = "C:\\gajahweb\\redis";
+  final postgresPath = "C:\\gajahweb\\postgres\\bin";
   late void terminalAdd;
 
-  void _checkRedisStatus() async {
-    bool processStatus = await checkProcess("redis-server.exe");
+  void _checkPostgresStatus() async {
+    bool processStatus = await checkProcess("postgres.exe");
     setState(() {
       status = processStatus;
     });
@@ -34,26 +34,25 @@ class _RediscontrolState extends State<Rediscontrol> {
     terminalAdd(message);
   }
 
-  Future<void> _trigerdRedis(bool value) async {
+  Future<void> _trigerdPostgres(bool value) async {
     if (value) {
       final process = await Process.start(
-        "$redisPath\\redis-server.exe",
-        [],
+        "$postgresPath\\postgres.exe",
+        ["-D", "$postgresPath\\data"],
         runInShell: false,
         mode: ProcessStartMode.normal,
-        workingDirectory: redisPath,
+        workingDirectory: postgresPath,
       );
       process.stdout.transform(systemEncoding.decoder).listen((data) {
         sendTerminal(data);
       });
       setState(() {
+        sendTerminal("Berhasil Menjalankan Postgresql Server [postgres.exe]");
         status = true;
       });
     } else {
-      await killProcess("redis-server.exe");
-      sendTerminal(
-        "Menghentikan Proses [redis-server.exe]\nBerhasil Dilakukan!",
-      );
+      await killProcess("postgres.exe");
+      sendTerminal("Menghentikan Proses [postgres.exe]\nBerhasil Dilakukan!");
       setState(() {
         status = false;
       });
@@ -62,9 +61,9 @@ class _RediscontrolState extends State<Rediscontrol> {
 
   @override
   void initState() {
-    _checkRedisStatus();
+    _checkPostgresStatus();
     Timer.periodic(Duration(seconds: 2), (timer) {
-      _checkRedisStatus();
+      _checkPostgresStatus();
     });
     super.initState();
   }
@@ -80,16 +79,16 @@ class _RediscontrolState extends State<Rediscontrol> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             spacing: 10,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Image(
-                image: AssetImage("assets/redis.png"),
+                image: AssetImage("assets/postgre.png"),
                 width: 32,
                 height: 32,
               ),
               Text(
-                "Redis Server",
+                "PostgreSQL Server",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -100,7 +99,7 @@ class _RediscontrolState extends State<Rediscontrol> {
                 activeColor: const Color.fromARGB(255, 14, 175, 9),
                 value: status,
                 onChanged: (value) {
-                  _trigerdRedis(value);
+                  _trigerdPostgres(value);
                 },
               ),
             ],
@@ -119,10 +118,10 @@ class _RediscontrolState extends State<Rediscontrol> {
                   padding: EdgeInsets.all(7),
                   child: InkWell(
                     onTap: () async {
-                      String pathRedis = "C:\\gajahweb\\redis";
+                      String pathRedis = "C:\\gajahweb\\postgres\\bin";
                       await Process.start(
                         "cmd.exe",
-                        ["/c", "start", "redis-cli.exe"],
+                        ["/c", "start", "psql.exe", "-U", "postgres"],
                         workingDirectory: pathRedis,
                         runInShell: true,
                         mode: ProcessStartMode.detached,
