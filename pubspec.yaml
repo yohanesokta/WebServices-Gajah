@@ -71,6 +71,7 @@ flutter:
     - resource/config.zip
     - resource/wget.exe
     - resource/mariadb-generate-data.bat
+    - resource/postgres-port.bat
     - resource/unzip.exe
     - resource/mariadb-port.bat
     - resource/nginx-port.bat

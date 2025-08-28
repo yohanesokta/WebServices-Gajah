@@ -22,8 +22,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _nginxPort.text = preferences.getString("nginxPort") ?? "80";
       _mariadbPort.text = preferences.getString("mariadbPort") ?? "3306";
-      _postgresqlPort.text =
-          preferences.getString("postgresqlPort") ?? "Belum Tersedia";
+      _postgresqlPort.text = preferences.getString("postgresqlPort") ?? "5432";
     });
   }
 
@@ -32,9 +31,7 @@ class _SettingsState extends State<Settings> {
     final String mariadbPort = preferences.getString("mariadbPort") ?? "3306";
     final String postgresqlPort =
         preferences.getString("postgresqlPort") ?? "5473";
-    // if (nginxPort != _nginxPort.text || mariadbPort != _mariadbPort.text || postgresqlPort != _postgresqlPort.text) {
 
-    // }
     if (nginxPort != _nginxPort.text) {
       await Process.start(
         "cmd.exe",
@@ -57,6 +54,19 @@ class _SettingsState extends State<Settings> {
       );
       killProcess('mysqld.exe');
       await preferences.setString("mariadbPort", _mariadbPort.text);
+    }
+
+    if (postgresqlPort != _postgresqlPort.text) {
+      await Process.start(
+        "cmd.exe",
+        ["/c", "postgres-port.bat", _postgresqlPort.text],
+        mode: ProcessStartMode.detached,
+        runInShell: true,
+        workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
+      );
+
+      killProcess('postgres.exe');
+      await preferences.setString("postgresqlPort", _postgresqlPort.text);
     }
   }
 

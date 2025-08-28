@@ -15,11 +15,11 @@ class Postgresqlcontrol extends StatefulWidget {
 
 class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
   bool status = false;
-  final redisPath = "C:\\gajahweb\\redis";
+  final postgresPath = "C:\\gajahweb\\postgres\\bin";
   late void terminalAdd;
 
-  void _checkRedisStatus() async {
-    bool processStatus = await checkProcess("redis-server.exe");
+  void _checkPostgresStatus() async {
+    bool processStatus = await checkProcess("postgres.exe");
     setState(() {
       status = processStatus;
     });
@@ -34,26 +34,25 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
     terminalAdd(message);
   }
 
-  Future<void> _trigerdRedis(bool value) async {
+  Future<void> _trigerdPostgres(bool value) async {
     if (value) {
       final process = await Process.start(
-        "$redisPath\\redis-server.exe",
-        [],
+        "$postgresPath\\postgres.exe",
+        ["-D", "$postgresPath\\data"],
         runInShell: false,
         mode: ProcessStartMode.normal,
-        workingDirectory: redisPath,
+        workingDirectory: postgresPath,
       );
       process.stdout.transform(systemEncoding.decoder).listen((data) {
         sendTerminal(data);
       });
       setState(() {
+        sendTerminal("Berhasil Menjalankan Postgresql Server [postgres.exe]");
         status = true;
       });
     } else {
-      await killProcess("redis-server.exe");
-      sendTerminal(
-        "Menghentikan Proses [redis-server.exe]\nBerhasil Dilakukan!",
-      );
+      await killProcess("postgres.exe");
+      sendTerminal("Menghentikan Proses [postgres.exe]\nBerhasil Dilakukan!");
       setState(() {
         status = false;
       });
@@ -62,9 +61,9 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
 
   @override
   void initState() {
-    _checkRedisStatus();
+    _checkPostgresStatus();
     Timer.periodic(Duration(seconds: 2), (timer) {
-      _checkRedisStatus();
+      _checkPostgresStatus();
     });
     super.initState();
   }
@@ -81,6 +80,7 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
           ),
           child: Column(
             spacing: 10,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Image(
                 image: AssetImage("assets/postgre.png"),
@@ -88,7 +88,7 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
                 height: 32,
               ),
               Text(
-                "Postgresql",
+                "PostgreSQL Server",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -99,7 +99,7 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
                 activeColor: const Color.fromARGB(255, 14, 175, 9),
                 value: status,
                 onChanged: (value) {
-                  _trigerdRedis(value);
+                  _trigerdPostgres(value);
                 },
               ),
             ],
@@ -118,10 +118,10 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
                   padding: EdgeInsets.all(7),
                   child: InkWell(
                     onTap: () async {
-                      String pathRedis = "C:\\gajahweb\\redis";
+                      String pathRedis = "C:\\gajahweb\\postgres\\bin";
                       await Process.start(
                         "cmd.exe",
-                        ["/c", "start", "redis-cli.exe"],
+                        ["/c", "start", "psql.exe", "-U", "postgres"],
                         workingDirectory: pathRedis,
                         runInShell: true,
                         mode: ProcessStartMode.detached,

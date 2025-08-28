@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gajahweb/components/information.dart';
 import 'package:gajahweb/components/postgresqlControl.dart';
+import 'package:gajahweb/components/xamppSameless.dart';
 import 'package:gajahweb/utils/process.dart';
 import 'package:gajahweb/utils/runtime.dart';
 import '/components/mariadbControl.dart';
@@ -67,7 +68,7 @@ class _HomeAppState extends State<HomeApp> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [Postgresqlcontrol()],
+              children: [Postgresqlcontrol(), Xamppsameless()],
             ),
             Information(),
             Row(

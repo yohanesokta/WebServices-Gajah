@@ -16,7 +16,7 @@ unzip.exe -o config.zip -d %OUTDIR%\config
 
 
 :nginx
-echo "Download Nginx 1.28.0 [1 of 6]"
+echo "Download Nginx 1.28.0 [1 of 7]"
 if exist "%OUTDIR%\nginx" ( 
     goto php
 )
@@ -30,7 +30,7 @@ copy "%OUTDIR%\config\nginx.conf" "%OUTDIR%\nginx\conf\nginx.conf"
 if exist "%OUTDIR%\php" ( 
     goto mariadb
 )
-echo "Download PHP 8.4.11 [2 of 6]"
+echo "Download PHP 8.4.11 [2 of 7]"
 wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-8.4.11-Win32-vs17-x64.zip -O %OUTDIR%\var\php-8.4.11.zip
 unzip.exe -o %OUTDIR%\var\php-8.4.11.zip -d %OUTDIR%\php
 copy "%OUTDIR%\config\php.ini" "%OUTDIR%\php\php.ini"
@@ -39,7 +39,7 @@ copy "%OUTDIR%\config\php.ini" "%OUTDIR%\php\php.ini"
 if exist "%OUTDIR%\mariadb" ( 
     goto phpmyadmin
 )
-echo "Download MariaDB (MYSQL Server) [3 of 6]"
+echo "Download MariaDB (MYSQL Server) [3 of 7]"
 wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/mariadb-12.0.2-winx64.zip -O %OUTDIR%\mariadb-12.zip
 unzip.exe -o %OUTDIR%\mariadb-12.zip -d %OUTDIR%\tmp\
 move "%OUTDIR%\tmp\mariadb-12.0.2-winx64" "%OUTDIR%\mariadb"
@@ -49,7 +49,7 @@ move "%OUTDIR%\tmp\mariadb-12.0.2-winx64" "%OUTDIR%\mariadb"
 if exist "%OUTDIR%\htdocs\phpmyadmin" ( 
     goto redis
 )
-echo "Download phpMyAdmin [4 of 6]"
+echo "Download phpMyAdmin [4 of 7]"
 wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/phpMyAdmin-5.2.2-all-languages.zip -O %OUTDIR%\phpMyAdmin.zip
 unzip.exe -o %OUTDIR%\phpMyAdmin.zip -d %OUTDIR%\tmp\
 move "%OUTDIR%\tmp\phpMyAdmin-5.2.2-all-languages" "%OUTDIR%\htdocs\phpmyadmin"
@@ -57,7 +57,7 @@ copy "%OUTDIR%\config\config.inc.php" "%OUTDIR%\htdocs\phpmyadmin\config.inc.php
 copy "%OUTDIR%\config\index.php" "%OUTDIR%\htdocs\index.php"
 
 :redis
-echo "Download Redis [5 of 6]"
+echo "Download Redis [5 of 7]"
 if exist "%OUTDIR%\redis" ( 
     goto heidisql
 )
@@ -65,21 +65,30 @@ wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runt
 unzip.exe -o %OUTDIR%\redis.zip -d %OUTDIR%\redis
 
 :heidisql
-echo "Download HeidiSql [6 of 6]"
+echo "Download HeidiSql [6 of 7]"
 if exist "%OUTDIR%\heidisql" ( 
-    goto clear
+    goto postgres
 )
 wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/HeidiSQL_12.11_32_Portable.zip -O %OUTDIR%\heidisql.zip
 unzip.exe -o %OUTDIR%\heidisql.zip -d %OUTDIR%\heidisql
 
-:clear
+:postgres
+echo "Download Postgresql 17 [7 of 7]"
+if exist "%OUTDIR%\postgres" (
+    goto clear
+)
+wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/postgresql-17.6.0-x86_64-pc-windows-msvc.zip -O %OUTDIR%\postgres.zip
+unzip.exe -o %OUTDIR%\postgres.zip -d %OUTDIR%\postgres
 
+
+:clear
 echo "Clearing Download Files"
 del /f /q %OUTDIR%\mariadb-12.zip
 del /f /q %OUTDIR%\nginx-1.28.zip
 del /f /q %OUTDIR%\php-8.4.11.zip
 del /f /q %OUTDIR%\phpMyAdmin.zip
 del /f /q %OUTDIR%\heidisql.zip
+del /f /q %OUTDIR%\postgres.zip
 
 del /f /q %OUTDIR%\redis.zip
 rmdir /s /q %OUTDIR%\tmp
@@ -89,7 +98,7 @@ echo "mariadb-12" >> %OUTDIR%\install.log
 echo "nginx-1.28" >> %OUTDIR%\install.log
 echo "php-8.4.11" >> %OUTDIR%\install.log
 echo "tporadowski/redis" >> %OUTDIR%\install.log
-
+echo "postgres-17" >> %OUTDIR%\install.log
 cls
 
 echo SETUP TELAH BERHASIL DI LAKUKAN!
