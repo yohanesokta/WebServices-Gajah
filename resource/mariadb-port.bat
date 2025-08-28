@@ -6,7 +6,7 @@ set ROOTDIR=C:\gajahweb
 set TEMPLATE=%ROOTDIR%\config\mariadb.conf.template
 set OUTPUT=%ROOTDIR%\mariadb\data\my.ini
 
-powershell -command "Expand-Archive -Force 'config.zip' '%ROOTDIR%\config\'"
+unzip.exe -o config.zip -d %ROOTDIR%\config\
 echo Membuat config dengan port %PORT% ...
 
 (
@@ -16,6 +16,8 @@ for /f "usebackq delims=" %%A in ("%TEMPLATE%") do (
     echo !line!
 )
 ) > "%OUTPUT%"
+
+rmdir /s /q %ROOTDIR%\config
 
 echo Selesai! nginx.conf digenerate pakai port %PORT%.
 endlocal

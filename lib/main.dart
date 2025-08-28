@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:network_tools/network_tools.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:gajahweb/components/part/about.dart';
@@ -12,8 +14,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
+  final appDirectory = await getApplicationDocumentsDirectory();
+  await configureNetworkTools(appDirectory.path, enableDebugging: true);
+
   WindowOptions windowOptions = const WindowOptions(
-    size: Size(445, 400),
+    size: Size(445, 550),
     center: true,
     title: "Gajah Webserver",
   );
@@ -49,12 +54,8 @@ class MainApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color.fromARGB(255, 18, 18, 18),
         scrollbarTheme: ScrollbarThemeData(
           thumbColor: MaterialStateProperty.all(Colors.blue), // warna thumb
-          trackColor: MaterialStateProperty.all(
-            Colors.grey[300],
-          ),
-          trackBorderColor: MaterialStateProperty.all(
-            Colors.grey,
-          ),
+          trackColor: MaterialStateProperty.all(Colors.grey[300]),
+          trackBorderColor: MaterialStateProperty.all(Colors.grey),
         ),
       ),
       debugShowCheckedModeBanner: false,

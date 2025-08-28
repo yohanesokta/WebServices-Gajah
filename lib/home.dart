@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gajahweb/components/information.dart';
+import 'package:gajahweb/components/postgresqlControl.dart';
+import 'package:gajahweb/components/xamppSameless.dart';
 import 'package:gajahweb/utils/process.dart';
 import 'package:gajahweb/utils/runtime.dart';
 import '/components/mariadbControl.dart';
@@ -64,8 +66,11 @@ class _HomeAppState extends State<HomeApp> {
               spacing: 10,
               children: [Nginxcontrol(), Mariadbcontrol(), Rediscontrol()],
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [Postgresqlcontrol(), Xamppsameless()],
+            ),
             Information(),
-
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -73,7 +78,7 @@ class _HomeAppState extends State<HomeApp> {
               children: [
                 InkWell(
                   onTap: () {
-                   StartProgram("C:\\gajahweb\\heidisql\\heidisql.exe", []);
+                    StartProgram("C:\\gajahweb\\heidisql\\heidisql.exe", []);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -85,7 +90,10 @@ class _HomeAppState extends State<HomeApp> {
                       spacing: 5,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.storage, color: const Color.fromARGB(255, 255, 255, 255)),
+                        Icon(
+                          Icons.storage,
+                          color: const Color.fromARGB(255, 255, 255, 255),
+                        ),
                         Text("HeidiSQL", style: TextStyle(color: Colors.white)),
                       ],
                     ),
@@ -93,12 +101,12 @@ class _HomeAppState extends State<HomeApp> {
                 ),
                 InkWell(
                   onTap: () {
-                   StartProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\"]);
+                    StartProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\"]);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 133, 133, 133),
+                      color: const Color.fromARGB(255, 70, 70, 70),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Row(
@@ -132,8 +140,11 @@ class _HomeAppState extends State<HomeApp> {
               child: Row(
                 spacing: 3,
                 children: [
-                  Icon(Icons.info_outline , color: Colors.white,size: 14,),
-                  Text("About",style: TextStyle(fontSize: 12, color: Colors.white),)
+                  Icon(Icons.info_outline, color: Colors.white, size: 14),
+                  Text(
+                    "About",
+                    style: TextStyle(fontSize: 12, color: Colors.white),
+                  ),
                 ],
               ),
             ),
