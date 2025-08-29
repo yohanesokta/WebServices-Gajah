@@ -11,7 +11,7 @@
 
 Selamat datang di **Gajah Webserver** Proyek ini menyediakan paket web server yang mudah digunakan untuk pengembangan lokal, yang mencakup Nginx, PHP 8.4, dan MariaDB (MySQL). Proyek ini juga terintegrasi dengan Flutter untuk pengembangan aplikasi web dan desktop.
 
-## ✨ Fitur Unggulan
+## Fitur Unggulan
 
   * **Nginx**: Server web berkinerja tinggi, ringan, dan andal.
   * **PHP 8.4**: Versi terbaru PHP untuk performa optimal dan fitur modern.
@@ -20,7 +20,7 @@ Selamat datang di **Gajah Webserver** Proyek ini menyediakan paket web server ya
 
 -----
 
-## 🚀 Memulai
+## Memulai
 
 Ikuti langkah-langkah sederhana di bawah ini untuk segera memulai. diperlukan visual studio dan runtime Desktop Development with C++ wajib!
 
@@ -51,11 +51,11 @@ Aplikasi desktop Flutter Anda akan segera diluncurkan di jendela baru.
 
 -----
 
-## 🤝 Kontribusi
+## Kontribusi
 
 Kami sangat menghargai setiap bentuk kontribusi, baik berupa perbaikan bug, fitur baru, atau dokumentasi. Kontribusi Anda membuat proyek ini lebih baik!
 
-### ⚙️ Alur Kontribusi
+### Alur Kontribusi
 
 1.  **Fork** repositori ini ke akun GitHub Anda.
 2.  **Clone** repositori yang telah Anda *fork* ke komputer lokal Anda:
@@ -77,7 +77,7 @@ Kami sangat menghargai setiap bentuk kontribusi, baik berupa perbaikan bug, fitu
     ```
 7.  Buka repositori yang Anda *fork* di GitHub dan buat **Pull Request** ke *branch* utama (biasanya `main` atau `master`) dari repositori ini.
 
-### 📝 Panduan Pesan Commit
+### Panduan Pesan Commit
 
 Untuk menjaga riwayat *commit* tetap bersih dan terstruktur, mohon gunakan standar [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) dalam pesan Anda, misalnya:
 

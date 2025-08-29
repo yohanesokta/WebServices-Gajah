@@ -14,6 +14,7 @@ class _SettingsState extends State<Settings> {
   final TextEditingController _nginxPort = TextEditingController();
   final TextEditingController _mariadbPort = TextEditingController();
   final TextEditingController _postgresqlPort = TextEditingController();
+  String _htdocsPath = "C:\\gajahweb\\htdocs";
 
   late SharedPreferences preferences;
 
@@ -23,6 +24,7 @@ class _SettingsState extends State<Settings> {
       _nginxPort.text = preferences.getString("nginxPort") ?? "80";
       _mariadbPort.text = preferences.getString("mariadbPort") ?? "3306";
       _postgresqlPort.text = preferences.getString("postgresqlPort") ?? "5432";
+      _htdocsPath = preferences.getString("htdocs") ?? "C:\\gajahweb\\htdocs";
     });
   }
 
@@ -35,7 +37,7 @@ class _SettingsState extends State<Settings> {
     if (nginxPort != _nginxPort.text) {
       await Process.start(
         "cmd.exe",
-        ['/c', 'nginx-port.bat', _nginxPort.text],
+        ['/c', 'nginx-port.bat', _nginxPort.text, _htdocsPath],
         runInShell: true,
         mode: ProcessStartMode.detached,
         workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
