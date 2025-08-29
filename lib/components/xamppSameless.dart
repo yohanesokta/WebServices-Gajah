@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Xamppsameless extends StatefulWidget {
   const Xamppsameless({super.key});
@@ -8,6 +11,51 @@ class Xamppsameless extends StatefulWidget {
 }
 
 class _XamppsamelessState extends State<Xamppsameless> {
+  String htdocs = "C:\\gajahweb\\htdocs";
+  late String _nginxPort;
+  Future<void> initializeState() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      _nginxPort = preferences.getString("nginxPort") ?? "80";
+      htdocs = preferences.getString("htdocs") ?? "C:\\gajahweb\\htdocs";
+    });
+  }
+
+  bool _defaultPath() {
+    return htdocs == "C:\\gajahweb\\htdocs";
+  }
+
+  Future<void> change() async {
+    setState(() {
+      if (_defaultPath()) {
+        htdocs = "C:\\xampp\\htdocs";
+      } else {
+        htdocs = "C:\\gajahweb\\htdocs";
+      }
+    });
+
+    await Process.start(
+      "cmd.exe",
+      ['/c', 'nginx-port.bat', _nginxPort, htdocs],
+      runInShell: true,
+      mode: ProcessStartMode.detached,
+      workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
+    );
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setString("htdocs", htdocs);
+    await Process.run("C:\\gajahweb\\nginx\\nginx.exe", [
+      "-s",
+      "stop",
+    ], workingDirectory: "C:\\gajahweb\\nginx");
+    await Process.run("taskkill.exe", ["/F", "/IM", "nginx.exe"]);
+  }
+
+  @override
+  void initState() {
+    initializeState();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,11 +84,15 @@ class _XamppsamelessState extends State<Xamppsameless> {
                 style: TextStyle(color: Colors.white, fontSize: 10),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  change();
+                },
                 child: Text(
-                  "Enable",
+                  (!_defaultPath()) ? "Enable" : "Disable",
                   style: TextStyle(
-                    color: const Color.fromARGB(255, 85, 255, 79),
+                    color: (!_defaultPath())
+                        ? Color.fromARGB(255, 85, 255, 79)
+                        : Colors.red,
                     fontSize: 10,
                   ),
                 ),
