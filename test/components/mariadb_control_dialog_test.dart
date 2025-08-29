@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gajahweb/components/mariadbControl.dart';
+import 'package:gajahweb/components/part/Notification.dart';
 
 void main() {
-  testWidgets('showConfirmDialog returns true when pressing Ya', (tester) async {
+  testWidgets('showConfirmDialog returns true when pressing Ya', (
+    tester,
+  ) async {
     bool? result;
 
     await tester.pumpWidget(
@@ -37,7 +39,9 @@ void main() {
     expect(result, isTrue);
   });
 
-  testWidgets('showConfirmDialog returns false when pressing Tidak', (tester) async {
+  testWidgets('showConfirmDialog returns false when pressing Tidak', (
+    tester,
+  ) async {
     bool? result;
 
     await tester.pumpWidget(
@@ -71,4 +75,3 @@ void main() {
     expect(result, isFalse);
   });
 }
-

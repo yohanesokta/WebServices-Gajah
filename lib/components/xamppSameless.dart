@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:gajahweb/components/part/Notification.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -106,7 +106,12 @@ class _XamppsamelessState extends State<Xamppsameless> {
                 style: TextStyle(color: Colors.white, fontSize: 10),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  showConfirmDialog(
+                    context,
+                    "Jika mau menggunakan mysql sameless. Start manual mysql dari xampp panel! ",
+                  );
+                },
                 child: Text(
                   "Manual",
                   style: TextStyle(color: Colors.grey, fontSize: 10),
