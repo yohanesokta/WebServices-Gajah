@@ -75,11 +75,18 @@ unzip.exe -o %OUTDIR%\heidisql.zip -d %OUTDIR%\heidisql
 :postgres
 echo "Download Postgresql 17 [7 of 7]"
 if exist "%OUTDIR%\postgres" (
-    goto clear
+    goto apache
 )
 wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/postgresql-17.6.0-x86_64-pc-windows-msvc.zip -O %OUTDIR%\postgres.zip
 unzip.exe -o %OUTDIR%\postgres.zip -d %OUTDIR%\postgres
 
+
+:apache
+if exist "%OUTDIR%\apache" (
+    goto clear
+)
+wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/apache.zip -O %OUTDIR%\apache.zip
+unzip.exe -o %OUTDIR%\apache.zip -d %OUTDIR%\apache
 
 :clear
 echo "Clearing Download Files"
