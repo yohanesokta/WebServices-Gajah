@@ -24,7 +24,7 @@ Future<List<Phpversion>?> getDataVersion(bool stable) async {
           );
     var response = await http.get(url);
     if (response.statusCode != 200) {
-      print("archive version get failed");
+    // print("fail get php version");
       return null;
     }
     List<dynamic> data = (jsonDecode(response.body) as List<dynamic>);
@@ -33,7 +33,7 @@ Future<List<Phpversion>?> getDataVersion(bool stable) async {
         .toList();
     return phpversion;
   } catch (error) {
-    print(error);
+    // print(e);
     return null;
   }
 }

@@ -6,8 +6,8 @@ import 'package:window_manager/window_manager.dart';
 import 'package:gajahweb/components/part/about.dart';
 import 'package:gajahweb/components/part/download.dart';
 import 'package:gajahweb/components/part/settings.dart';
-import 'package:gajahweb/utils/slideLeftRoute.dart';
-import 'package:gajahweb/utils/terminalContext.dart';
+import 'package:gajahweb/utils/slide_left_route.dart';
+import 'package:gajahweb/utils/terminal_context.dart';
 import 'home.dart';
 
 void main() async {
@@ -53,9 +53,9 @@ class MainApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color.fromARGB(255, 18, 18, 18),
         scrollbarTheme: ScrollbarThemeData(
-          thumbColor: MaterialStateProperty.all(Colors.blue), // warna thumb
-          trackColor: MaterialStateProperty.all(Colors.grey[300]),
-          trackBorderColor: MaterialStateProperty.all(Colors.grey),
+          thumbColor: WidgetStateProperty.all(Colors.blue), // warna thumb
+          trackColor: WidgetStateProperty.all(Colors.grey[300]),
+          trackBorderColor: WidgetStateProperty.all(Colors.grey),
         ),
       ),
       debugShowCheckedModeBanner: false,

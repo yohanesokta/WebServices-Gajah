@@ -1,9 +1,9 @@
-import 'dart:ffi';
+
 
 import 'package:flutter/material.dart';
 import 'package:gajahweb/utils/process.dart';
 import 'package:provider/provider.dart';
-import 'package:gajahweb/utils/terminalContext.dart';
+import 'package:gajahweb/utils/terminal_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Information extends StatefulWidget {
@@ -21,6 +21,7 @@ class _InformationState extends State<Information> {
     String nginxPort = preferences.getString("nginxPort") ?? "80";
     String mariadbPort = preferences.getString("mariadbPort") ?? "3306";
 
+    if (!mounted) return;
     final terminalContext = Provider.of<Terminalcontext>(
       context,
       listen: false,

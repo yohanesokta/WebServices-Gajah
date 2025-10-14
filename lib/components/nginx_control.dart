@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 import 'package:gajahweb/utils/process.dart';
 import 'package:provider/provider.dart';
-import 'package:gajahweb/utils/terminalContext.dart';
+import 'package:gajahweb/utils/terminal_context.dart';
 
 class Nginxcontrol extends StatefulWidget {
   const Nginxcontrol({super.key});
@@ -18,7 +18,6 @@ class Nginxcontrol extends StatefulWidget {
 class _Nginxcontrol extends State<Nginxcontrol> {
   bool status = false;
 
-  @override
   Future<void> sendTerminal(String message) async {
     final terminalAdd = Provider.of<Terminalcontext>(
       context,
@@ -97,12 +96,10 @@ class _Nginxcontrol extends State<Nginxcontrol> {
             mainAxisSize: MainAxisSize.min,
             spacing: 10,
             children: [
-              Container(
-                child: Image(
-                  image: AssetImage("assets/nginx.png"),
-                  width: 32,
-                  height: 32,
-                ),
+              Image(
+                image: AssetImage("assets/nginx.png"),
+                width: 32,
+                height: 32,
               ),
               Text(
                 "Nginx Server",
@@ -113,7 +110,7 @@ class _Nginxcontrol extends State<Nginxcontrol> {
                 ),
               ),
               Switch(
-                activeColor: const Color.fromARGB(255, 14, 175, 9),
+                activeThumbColor: const Color.fromARGB(255, 14, 175, 9),
                 value: status,
                 onChanged: (value) {
                   _startNginx(value);

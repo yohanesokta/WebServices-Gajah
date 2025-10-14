@@ -6,12 +6,12 @@ Future<bool> checkProcess(String nameProcess) async {
     final output = result.stdout.toString().toLowerCase();
     return output.contains(nameProcess);
   } catch (error) {
-    print(error.toString());
+    // print(error.toString());
     return false;
   }
 }
 
-Future<void> StartProgram(String path, List<String> arguments) async {
+Future<void> startProgram(String path, List<String> arguments) async {
   try {
     await Process.start(
       path,
@@ -20,7 +20,7 @@ Future<void> StartProgram(String path, List<String> arguments) async {
       runInShell: false,
     );
   } catch (err) {
-    print(err);
+    // print(err);
   }
 }
 
@@ -34,7 +34,7 @@ Future<bool> killProcess(String nameProcess) async {
     final output = result.stdout.toString();
     return output.isNotEmpty;
   } catch (error) {
-    print(error);
+    // print(error);
     return false;
   }
 }

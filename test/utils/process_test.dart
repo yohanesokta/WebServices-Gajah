@@ -21,9 +21,9 @@ void main() {
       expect(killed, isA<bool>());
     });
 
-    test('StartProgram completes without throwing (Windows only)', () async {
+    test('startProgram completes without throwing (Windows only)', () async {
       if (!Platform.isWindows) return;
-      await StartProgram('cmd.exe', ['/c', 'echo', 'hello']);
+      await startProgram('cmd.exe', ['/c', 'echo', 'hello']);
     });
   });
 }

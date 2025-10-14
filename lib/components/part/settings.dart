@@ -117,52 +117,46 @@ class _SettingsState extends State<Settings> {
             Row(
               spacing: 10,
               children: [
-                Container(
-                  child: Expanded(
-                    child: TextField(
-                      controller: _nginxPort,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: "Nginx Port",
-                        border: OutlineInputBorder(),
-                        labelStyle: TextStyle(
-                          color: const Color.fromARGB(255, 187, 187, 187),
-                        ),
+                Expanded(
+                  child: TextField(
+                    controller: _nginxPort,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: "Nginx Port",
+                      border: OutlineInputBorder(),
+                      labelStyle: TextStyle(
+                        color: const Color.fromARGB(255, 187, 187, 187),
                       ),
-                      keyboardType: TextInputType.number,
                     ),
+                    keyboardType: TextInputType.number,
                   ),
                 ),
-                Container(
-                  child: Expanded(
-                    child: TextField(
-                      controller: _mariadbPort,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: "Mariadb Port",
-                        labelStyle: TextStyle(
-                          color: const Color.fromARGB(255, 187, 187, 187),
-                        ),
-                        border: OutlineInputBorder(),
+                Expanded(
+                  child: TextField(
+                    controller: _mariadbPort,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: "Mariadb Port",
+                      labelStyle: TextStyle(
+                        color: const Color.fromARGB(255, 187, 187, 187),
                       ),
-                      keyboardType: TextInputType.number,
+                      border: OutlineInputBorder(),
                     ),
+                    keyboardType: TextInputType.number,
                   ),
                 ),
-                Container(
-                  child: Expanded(
-                    child: TextField(
-                      controller: _postgresqlPort,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: "PostgreSQL Port",
-                        labelStyle: TextStyle(
-                          color: const Color.fromARGB(255, 187, 187, 187),
-                        ),
-                        border: OutlineInputBorder(),
+                Expanded(
+                  child: TextField(
+                    controller: _postgresqlPort,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: "PostgreSQL Port",
+                      labelStyle: TextStyle(
+                        color: const Color.fromARGB(255, 187, 187, 187),
                       ),
-                      keyboardType: TextInputType.number,
+                      border: OutlineInputBorder(),
                     ),
+                    keyboardType: TextInputType.number,
                   ),
                 ),
               ],

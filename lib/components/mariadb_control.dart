@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:gajahweb/utils/terminalContext.dart';
+import 'package:gajahweb/utils/terminal_context.dart';
 import '../utils/process.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
-import 'package:gajahweb/components/part/Notification.dart';
+import 'package:gajahweb/components/part/notification.dart';
 
 class Mariadbcontrol extends StatefulWidget {
   const Mariadbcontrol({super.key});
@@ -21,7 +21,6 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
   bool status = false;
   bool _isTrigger = false;
 
-  @override
   Future<void> sendTerminal(String message) async {
     final terminalAdd = Provider.of<Terminalcontext>(
       context,
@@ -40,7 +39,7 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
         killProcess('mysqld.exe');
         sendTerminal("Mematikan proses mysqld.exe\nBerhasil");
       } else {
-        final mysqldProcess = await Process.start(
+        await Process.start(
           "$mysqlPath\\bin\\mysqld.exe",
           ["--datadir=$mysqlPath\\data", "--console"],
           mode: ProcessStartMode.detached,
@@ -49,7 +48,7 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
         sendTerminal("memulai proses mysqld.exe\nBerhasil");
       }
     } catch (error) {
-      print(error);
+      // print(e);
     }
   }
 
@@ -62,6 +61,8 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
       _isTrigger = false;
     } else {
       bool checkActive = await checkPort(mariadb);
+
+      if (!mounted) return;
       if (checkActive) {
         if (mysqldProcess) {
           await showConfirmDialog(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gajahweb/components/information.dart';
-import 'package:gajahweb/components/postgresqlControl.dart';
-import 'package:gajahweb/components/xamppSameless.dart';
+import 'package:gajahweb/components/postgresql_control.dart';
+import 'package:gajahweb/components/xampp_sameless.dart';
 import 'package:gajahweb/utils/process.dart';
 import 'package:gajahweb/utils/runtime.dart';
-import '/components/mariadbControl.dart';
-import '/components/nginxControl.dart';
-import 'components/redisControl.dart';
+import 'package:gajahweb/components/mariadb_control.dart';
+import 'package:gajahweb/components/nginx_control.dart';
+import 'package:gajahweb/components/redis_control.dart';
 
 class HomeApp extends StatefulWidget {
   const HomeApp({super.key});
@@ -78,7 +78,7 @@ class _HomeAppState extends State<HomeApp> {
               children: [
                 InkWell(
                   onTap: () {
-                    StartProgram("C:\\gajahweb\\heidisql\\heidisql.exe", []);
+                    startProgram("C:\\gajahweb\\heidisql\\heidisql.exe", []);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -101,7 +101,7 @@ class _HomeAppState extends State<HomeApp> {
                 ),
                 InkWell(
                   onTap: () {
-                    StartProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\"]);
+                    startProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\"]);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
