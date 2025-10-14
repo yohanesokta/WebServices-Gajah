@@ -4,28 +4,27 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:gajahweb/utils/process.dart';
-import 'package:gajahweb/utils/terminalContext.dart';
+import 'package:gajahweb/utils/terminal_context.dart';
 
-class Postgresqlcontrol extends StatefulWidget {
-  const Postgresqlcontrol({super.key});
+class Rediscontrol extends StatefulWidget {
+  const Rediscontrol({super.key});
 
   @override
-  State<Postgresqlcontrol> createState() => _PostgresqlcontrolState();
+  State<Rediscontrol> createState() => _RediscontrolState();
 }
 
-class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
+class _RediscontrolState extends State<Rediscontrol> {
   bool status = false;
-  final postgresPath = "C:\\gajahweb\\postgres\\bin";
+  final redisPath = "C:\\gajahweb\\redis";
   late void terminalAdd;
 
-  void _checkPostgresStatus() async {
-    bool processStatus = await checkProcess("postgres.exe");
+  void _checkRedisStatus() async {
+    bool processStatus = await checkProcess("redis-server.exe");
     setState(() {
       status = processStatus;
     });
   }
 
-  @override
   Future<void> sendTerminal(String message) async {
     final terminalAdd = Provider.of<Terminalcontext>(
       context,
@@ -34,25 +33,26 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
     terminalAdd(message);
   }
 
-  Future<void> _trigerdPostgres(bool value) async {
+  Future<void> _trigerdRedis(bool value) async {
     if (value) {
       final process = await Process.start(
-        "$postgresPath\\postgres.exe",
-        ["-D", "$postgresPath\\data"],
+        "$redisPath\\redis-server.exe",
+        [],
         runInShell: false,
         mode: ProcessStartMode.normal,
-        workingDirectory: postgresPath,
+        workingDirectory: redisPath,
       );
       process.stdout.transform(systemEncoding.decoder).listen((data) {
         sendTerminal(data);
       });
       setState(() {
-        sendTerminal("Berhasil Menjalankan Postgresql Server [postgres.exe]");
         status = true;
       });
     } else {
-      await killProcess("postgres.exe");
-      sendTerminal("Menghentikan Proses [postgres.exe]\nBerhasil Dilakukan!");
+      await killProcess("redis-server.exe");
+      sendTerminal(
+        "Menghentikan Proses [redis-server.exe]\nBerhasil Dilakukan!",
+      );
       setState(() {
         status = false;
       });
@@ -61,9 +61,9 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
 
   @override
   void initState() {
-    _checkPostgresStatus();
+    _checkRedisStatus();
     Timer.periodic(Duration(seconds: 2), (timer) {
-      _checkPostgresStatus();
+      _checkRedisStatus();
     });
     super.initState();
   }
@@ -79,16 +79,16 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             spacing: 10,
-            mainAxisSize: MainAxisSize.max,
             children: [
               Image(
-                image: AssetImage("assets/postgre.png"),
+                image: AssetImage("assets/redis.png"),
                 width: 32,
                 height: 32,
               ),
               Text(
-                "PostgreSQL Server",
+                "Redis Server",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -96,10 +96,10 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
                 ),
               ),
               Switch(
-                activeColor: const Color.fromARGB(255, 14, 175, 9),
+                activeThumbColor: const Color.fromARGB(255, 14, 175, 9),
                 value: status,
                 onChanged: (value) {
-                  _trigerdPostgres(value);
+                  _trigerdRedis(value);
                 },
               ),
             ],
@@ -118,10 +118,10 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
                   padding: EdgeInsets.all(7),
                   child: InkWell(
                     onTap: () async {
-                      String pathRedis = "C:\\gajahweb\\postgres\\bin";
+                      String pathRedis = "C:\\gajahweb\\redis";
                       await Process.start(
                         "cmd.exe",
-                        ["/c", "start", "psql.exe", "-U", "postgres"],
+                        ["/c", "start", "redis-cli.exe"],
                         workingDirectory: pathRedis,
                         runInShell: true,
                         mode: ProcessStartMode.detached,

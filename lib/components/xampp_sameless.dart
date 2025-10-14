@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:gajahweb/components/part/Notification.dart';
+import 'package:gajahweb/components/part/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

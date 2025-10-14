@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gajahweb/utils/terminalContext.dart';
+import 'package:gajahweb/utils/terminal_context.dart';
 
 void main() {
   test('Terminalcontext.add stores message and notifies listeners', () {

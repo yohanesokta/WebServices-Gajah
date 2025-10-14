@@ -12,8 +12,7 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Gajah Webservice")),
-      body: Container(
-        child: Padding(
+      body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18.0,vertical: 20),
           child: Text(
                 "Dibuat dengan semangat oleh @yohanesokta\n"
@@ -22,7 +21,7 @@ class _AboutPageState extends State<AboutPage> {
                 style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,)
           ),
-        ),
+
       );
   }
 }

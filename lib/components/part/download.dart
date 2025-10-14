@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gajahweb/model/phpVersion.dart';
+import 'package:gajahweb/model/php_version.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
@@ -26,10 +26,10 @@ class _DownloadState extends State<Download> {
     );
 
     process.stdout.transform(systemEncoding.decoder).listen((data) {
-        print(data.toString());
+        // print(data.toString());
       });
     } catch (error) {
-      print(error);
+      // print(error);
     }
   }
 
@@ -61,8 +61,7 @@ class _DownloadState extends State<Download> {
           children: [Text("Download PHP Version"), Spacer(), Text("Stable"), Checkbox(value: isStable, onChanged: (value) {_changeStable(value!);})],
         )
       ),
-      body: Container(
-        child: FutureBuilder<List<Phpversion>?>(
+      body: FutureBuilder<List<Phpversion>?>(
           future: getDataVersion(isStable),
           builder: (context, data) {
             if (data.connectionState == ConnectionState.waiting) {
@@ -132,7 +131,6 @@ class _DownloadState extends State<Download> {
             );
           },
         ),
-      ),
     );
   }
 }
