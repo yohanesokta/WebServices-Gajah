@@ -2,10 +2,10 @@
 
 # Gajah Webserver
 
-Mengelola Nginx, PHP, MariaDB, PostgreSQL, dan Redis di Windows melalui aplikasi desktop Flutter.
+Mengelola Nginx, PHP, MariaDB, Apache ( NEW )* PostgreSQL, dan Redis di Windows melalui aplikasi desktop Flutter.
 
 <!-- Ganti OWNER/REPO di badge berikut setelah repo dipush ke GitHub -->
-[![CI – Flutter Tests](https://github.com/OWNER/REPO/actions/workflows/flutter-tests.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/flutter-tests.yml)
+[![CI – Flutter Tests](https://github.com/yohanesokta/WebServices-Gajah/actions/workflows/flutter-tests.yml/badge.svg)](https://github.com/yohanesokta/WebServices-Gajah/actions/workflows/flutter-tests.yml)
 
 ![Flutter](https://img.shields.io/badge/Flutter-stable-%2302569B?logo=flutter&logoColor=white&labelColor=0D1117&style=for-the-badge)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows&logoColor=white&labelColor=0D1117&style=for-the-badge)

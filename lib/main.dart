@@ -18,7 +18,7 @@ void main() async {
   await configureNetworkTools(appDirectory.path, enableDebugging: true);
 
   WindowOptions windowOptions = const WindowOptions(
-    size: Size(700, 550),
+    size: Size(590, 550),
     center: true,
     title: "Gajah Webserver",
   );

@@ -101,7 +101,7 @@ class _HomeAppState extends State<HomeApp> {
                 ),
                 InkWell(
                   onTap: () {
-                    startProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\\\"]);
+                    startProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\"]);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),

@@ -111,8 +111,8 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
             spacing: 10,
             children: [
               Image(
-                image: AssetImage("assets/mysqld.png"),
-                width: 32,
+                image: AssetImage("assets/mariadb.png"),
+                width: 60,
                 height: 32,
               ),
               Text(
