@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gajahweb/components/httpd_control.dart';
 import 'package:gajahweb/components/information.dart';
 import 'package:gajahweb/components/postgresql_control.dart';
 import 'package:gajahweb/components/xampp_sameless.dart';
@@ -64,11 +65,10 @@ class _HomeAppState extends State<HomeApp> {
           children: [
             Row(
               spacing: 10,
-              children: [Nginxcontrol(), Mariadbcontrol(), Rediscontrol()],
+              children: [Nginxcontrol(), Mariadbcontrol(), Rediscontrol(),HttpdControl()],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [Postgresqlcontrol(), Xamppsameless()],
+              children: [Postgresqlcontrol(), Expanded(child: Xamppsameless())],
             ),
             Information(),
             Row(
@@ -101,7 +101,7 @@ class _HomeAppState extends State<HomeApp> {
                 ),
                 InkWell(
                   onTap: () {
-                    startProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\"]);
+                    startProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\\\"]);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
