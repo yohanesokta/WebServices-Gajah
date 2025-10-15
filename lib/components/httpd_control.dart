@@ -37,6 +37,7 @@ class _HttpdControlState extends State<HttpdControl> {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String port = preferences.getString("httpdPort") ?? "8080";
     final webservicePath = "C:\\gajahweb";
+
     if (status) {
       await Process.run("taskkill.exe", ["/F", "/IM", "httpd.exe"]);
       sendTerminal("Menghentikan Proses [httpd.exe]\nBerhasil!");
@@ -44,12 +45,14 @@ class _HttpdControlState extends State<HttpdControl> {
       await Process.start(
         "$webservicePath\\apache\\bin\\httpd.exe",
         ["-f", "$webservicePath\\apache\\conf\\httpd.conf"],
-        mode: ProcessStartMode.normal,
         workingDirectory: "$webservicePath\\apache",
         runInShell: false,
+        mode: ProcessStartMode.detached,
       );
+
       sendTerminal("Memulai Httpd :$port\nBerhasil!");
     }
+
     setState(() {
       status = value;
     });
@@ -121,8 +124,10 @@ class _HttpdControlState extends State<HttpdControl> {
                   padding: EdgeInsets.all(7),
                   child: InkWell(
                     onTap: () async {
-                      final SharedPreferences preferences = await SharedPreferences.getInstance();
-                      String port = preferences.getString("httpdPort") ?? "8080";
+                      final SharedPreferences preferences =
+                          await SharedPreferences.getInstance();
+                      String port =
+                          preferences.getString("httpdPort") ?? "8080";
                       final Uri url = Uri.parse("http://localhost:$port");
                       await launchUrl(url);
                     },
