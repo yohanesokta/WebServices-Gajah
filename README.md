@@ -2,72 +2,103 @@
 
 # Gajah Webserver
 
-Mengelola Nginx, PHP, MariaDB, Apache ( NEW )* PostgreSQL, dan Redis di Windows melalui aplikasi desktop Flutter.
+**Manajemen Web Stack Lokal untuk Windows Menjadi Mudah.**
 
-<!-- Ganti OWNER/REPO di badge berikut setelah repo dipush ke GitHub -->
+<p>Sebuah panel kontrol desktop modern berbasis Flutter untuk mengelola Nginx, PHP, MariaDB, PostgreSQL, dan Redis di lingkungan Windows.</p>
+
+
 [![CI – Flutter Tests](https://github.com/yohanesokta/WebServices-Gajah/actions/workflows/flutter-tests.yml/badge.svg)](https://github.com/yohanesokta/WebServices-Gajah/actions/workflows/flutter-tests.yml)
 
-![Flutter](https://img.shields.io/badge/Flutter-stable-%2302569B?logo=flutter&logoColor=white&labelColor=0D1117&style=for-the-badge)
-![Windows](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows&logoColor=white&labelColor=0D1117&style=for-the-badge)
-![Nginx](https://img.shields.io/badge/Nginx-%23009639?logo=nginx&logoColor=white&labelColor=0D1117&style=for-the-badge)
-![MariaDB](https://img.shields.io/badge/MariaDB-003545?logo=mariadb&logoColor=white&labelColor=0D1117&style=for-the-badge)
-![PHP](https://img.shields.io/badge/PHP-%23777BB4?logo=php&logoColor=white&labelColor=0D1117&style=for-the-badge)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white&labelColor=0D1117&style=for-the-badge)
-![Redis](https://img.shields.io/badge/Redis-%23DD0031?logo=redis&logoColor=white&labelColor=0D1117&style=for-the-badge)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?style=for-the-badge&logo=conventionalcommits)](https://conventionalcommits.org)
 
 </div>
 
-## Ringkasan
-Gajah Webserver adalah panel kontrol desktop untuk Web Stack lokal di Windows. Aplikasi ini mempermudah start/stop service (Nginx, PHP-CGI, MariaDB, PostgreSQL, Redis), mengganti versi PHP, mengelola port, serta menyediakan log terminal terintegrasi.
+---
 
-## Fitur Utama
-- Nginx + PHP-CGI starter/stopper (port configurable)
-- MariaDB (mysqld) starter/stopper dan shortcut ke phpMyAdmin
-- PostgreSQL starter/stopper beserta shortcut psql CLI
-- Redis starter/stopper beserta shortcut redis-cli
-- XAMPP-sameless: toggle htdocs (C:\\gajahweb\\htdocs <-> C:\\xampp\\htdocs)
-- Halaman pengaturan (port & path), dan pembuka file konfigurasi (php.ini, nginx.conf, my.ini)
-- Halaman unduhan versi PHP (stable/arsip) dan switcher otomatis
-- Log terminal realtime di aplikasi
+### 🤔 Mengapa Gajah Webserver?
 
-## Persyaratan
-- Windows 10/11 (x64)
-- Flutter stable (Dart SDK sesuai pubspec)
-- Visual Studio dengan komponen "Desktop development with C++"
+Bagi developer yang bekerja di Windows, mengelola beberapa layanan web secara terpisah seringkali merepotkan. Proses start/stop service, mengganti versi PHP, atau sekadar melihat log membutuhkan banyak intervensi manual melalui command line atau skrip yang tersebar.
 
-## Instalasi Cepat
-1. Clone repo ini dan jalankan dependensi:
-   ```bash
-   flutter pub get
-   ```
-2. Jalankan bootstrap untuk aset native dan konfigurasi dasar:
-   - Klik ganda `setup.bat` (tersedia di root repo)
-3. Jalankan aplikasi (Windows desktop):
-   ```bash
-   flutter run -d windows
-   ```
+**Gajah Webserver** lahir untuk menyelesaikan masalah ini dengan menyediakan satu antarmuka grafis (GUI) yang intuitif dan terpusat, memungkinkan developer untuk fokus pada coding, bukan pada administrasi environment lokal.
 
-> Catatan: Aplikasi mengandalkan path `C:\gajahweb` untuk binary Nginx/PHP/MariaDB/PostgreSQL/Redis dan resource .bat yang sudah disertakan pada folder `resource/`. Pastikan `setup.bat` selesai tanpa error.
+### ✨ Demo Aplikasi
 
-## Konfigurasi
-- Port default: Nginx 80, MariaDB 3306, PostgreSQL 5432 (dapat diubah pada halaman Settings)
-- Htdocs default: `C:\\gajahweb\\htdocs` (dapat toggle ke `C:\\xampp\\htdocs` via XAMPP-sameless)
-- Shortcut untuk membuka `php.ini`, `nginx.conf`, dan `my.ini` via Notepad tersedia di Settings.
+<div align="center">
 
-## Menjalankan Test
-Proyek ini menggunakan unit dan widget test Flutter.
-- Jalankan seluruh test:
+![App Demo Placeholder](https://raw.githubusercontent.com/yohanesokta/WebServices-Gajah/refs/heads/main/pages/example.jpg)
+
+*Contoh demo aplikasi*
+
+</div>
+
+
+
+### Fitur Utama
+
+| Fitur | Deskripsi |
+| :--- | :--- |
+| quản lý **Kontrol Layanan** | Start/stop Nginx, PHP-CGI, MariaDB, PostgreSQL, dan Redis dengan satu klik. Aplikasi akan otomatis mendeteksi status proses dan port yang digunakan. |
+| 🔄 **PHP Version Switcher** | Ganti versi PHP secara dinamis. Unduh versi PHP (stabil atau arsip) langsung dari API, dan aplikasi akan menangani proses setup path secara otomatis. |
+| ⚙️ **Konfigurasi Cepat** | Ubah port default untuk setiap layanan dan buka file konfigurasi penting (`php.ini`, `nginx.conf`, `my.ini`) langsung dari menu Settings. |
+| 🖥️ **Terminal Terintegrasi** | Pantau log dari semua layanan secara realtime dalam satu tampilan terminal terpadu di dalam aplikasi. Tidak perlu membuka banyak window `cmd`. |
+| 🔗 **XAMPP-sameless Mode** | Fitur unik untuk beralih direktori `htdocs` antara environment Gajah Webserver (`C:\gajahweb\htdocs`) dan instalasi XAMPP yang sudah ada (`C:\xampp\htdocs`). |
+| 🛠️ **Akses Cepat CLI** | Disediakan shortcut untuk membuka *command line interface* (CLI) seperti `psql` dan `redis-cli` dengan konteks environment yang sudah sesuai. |
+
+### 📦 Instalasi & Setup
+
+#### 1. Prasyarat
+
+Pastikan perangkat Anda telah terinstall:
+- **Windows 10/11 (x64)**
+- **[Flutter SDK](https://flutter.dev/docs/get-started/install/windows)** (versi stabil)
+- **[Visual Studio](https://visualstudio.microsoft.com/downloads/)** dengan komponen "Desktop development with C++"
+
+#### 2. Proses Instalasi
+
+1.  **Clone Repository:**
+    ```bash
+    git clone https://github.com/yohanesokta/WebServices-Gajah.git
+    cd WebServices-Gajah
+    ```
+
+2.  **Install Dependensi Flutter:**
+    ```bash
+    flutter pub get
+    ```
+
+3.  **Jalankan Setup Script:**
+    Klik ganda file `setup.bat`. Skrip ini akan mengunduh binary yang diperlukan dan membuat struktur direktori di `C:\gajahweb`.
+
+    > **Penting:** Pastikan skrip `setup.bat` berjalan hingga selesai tanpa error.
+
+4.  **Jalankan Aplikasi:**
+    ```bash
+    flutter run -d windows
+    ```
+
+### 🗺️ Roadmap Pengembangan
+
+Berikut adalah beberapa rencana fitur untuk Gajah Webserver di masa depan:
+- [ ] **Dukungan Apache (httpd):** Menambahkan kontrol untuk Apache Web Server.
+- [ ] **UI/UX Refresh:** Pembaruan antarmuka agar lebih modern dan intuitif.
+- [ ] **Konfigurasi vhost:** Fitur untuk mengelola virtual host Nginx/Apache dari GUI.
+- [ ] **Plugin System:** Arsitektur plugin untuk menambahkan dukungan layanan lain.
+- [ ] **Dukungan Multi-platform:** Porting aplikasi untuk berjalan di macOS dan Linux.
+
+### 🧪 Menjalankan Test
+
+- **Jalankan semua test:**
   ```bash
   flutter test
   ```
-- Dengan coverage:
+
+- **Jalankan test dengan coverage:**
   ```bash
   flutter test --coverage
   ```
-- Menjalankan test tertentu (contoh):
-  ```bash
-  flutter test test/utils/process_test.dart
-  ```
+
 
 Test suite yang tersedia (ringkasan):
 - `test/utils/process_test.dart` – cek port/proses/kill/start (Windows-aware)
@@ -78,27 +109,10 @@ Test suite yang tersedia (ringkasan):
 - `test/components/mariadb_control_dialog_test.dart` – `showConfirmDialog()` Ya/Tidak
 - `test/widget_test.dart` – placeholder aman
 
-## Integrasi CI
-Workflow GitHub Actions disertakan untuk menjalankan test otomatis pada push/PR.
-- File: `.github/workflows/flutter-tests.yml`
-- Matrix: `ubuntu-latest`, `windows-latest`
-- Output: mengunggah artifact coverage `coverage/lcov.info`
+### 🤝 Kontribusi
 
-Tambahkan badge status CI di bagian header README dengan mengganti `OWNER/REPO` sesuai repo GitHub Anda:
+Kontribusi sangat kami harapkan! Silakan buka *Issue* atau *Pull Request*.
 
+### 📄 Lisensi
 
-
-## Struktur Proyek (ringkas)
-- `lib/components/` – widget kontrol layanan (nginx, mariadb, redis, postgresql)
-- `lib/components/part/` – halaman About, Download, Settings
-- `lib/utils/` – utilitas proses/port/runtime/route/terminal context
-- `lib/model/` – model data versi PHP
-- `test/` – unit & widget tests
-- `resource/` – skrip .bat dan utilitas pendukung native
-- `setup.bat` – bootstrap lingkungan lokal
-
-## Kontribusi
-Kontribusi sangat diterima! Buka issue/PR untuk bugfix, fitur, atau peningkatan dokumentasi. Gunakan format pesan commit ala Conventional Commits (feat, fix, docs, style, refactor, chore).
-
-## Lisensi
-Dirilis di bawah [MIT License](https://opensource.org/licenses/MIT).
+Dirilis di bawah [Lisensi MIT](https://opensource.org/licenses/MIT).
