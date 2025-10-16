@@ -4,9 +4,12 @@ Future<bool> checkProcess(String nameProcess) async {
   try {
     final result = await Process.run('tasklist', [], runInShell: true);
     final output = result.stdout.toString().toLowerCase();
-    return output.contains(nameProcess);
+    final pattern = RegExp(
+      r'^\s*' + RegExp.escape(nameProcess.toLowerCase()) + r'\b',
+      multiLine: true,
+    );
+    return pattern.hasMatch(output);
   } catch (error) {
-    // print(error.toString());
     return false;
   }
 }
@@ -39,7 +42,7 @@ Future<bool> killProcess(String nameProcess) async {
   }
 }
 
-Future<bool> checkPort(String port) async {
+Future<bool> isPortAvailable(String port) async {
   try {
     final server = await ServerSocket.bind(
       InternetAddress.anyIPv4,

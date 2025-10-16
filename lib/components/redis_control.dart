@@ -15,10 +15,13 @@ class Rediscontrol extends StatefulWidget {
 
 class _RediscontrolState extends State<Rediscontrol> {
   bool status = false;
+  bool _isManualChanging = false;
+  Timer? _statusTimer;
   final redisPath = "C:\\gajahweb\\redis";
   late void terminalAdd;
 
   void _checkRedisStatus() async {
+    if (_isManualChanging) return;
     bool processStatus = await checkProcess("redis-server.exe");
     setState(() {
       status = processStatus;
@@ -34,6 +37,7 @@ class _RediscontrolState extends State<Rediscontrol> {
   }
 
   Future<void> _trigerdRedis(bool value) async {
+    _isManualChanging = true;
     if (value) {
       final process = await Process.start(
         "$redisPath\\redis-server.exe",
@@ -57,15 +61,24 @@ class _RediscontrolState extends State<Rediscontrol> {
         status = false;
       });
     }
+    Future.delayed(const Duration(seconds: 2), () {
+      _isManualChanging = false;
+    });
   }
 
   @override
   void initState() {
     _checkRedisStatus();
-    Timer.periodic(Duration(seconds: 2), (timer) {
+    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _checkRedisStatus();
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    super.dispose();
   }
 
   @override

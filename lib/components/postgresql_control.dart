@@ -15,10 +15,13 @@ class Postgresqlcontrol extends StatefulWidget {
 
 class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
   bool status = false;
+  bool _isManualChanging = false;
+  Timer? _statusTimer;
   final postgresPath = "C:\\gajahweb\\postgres\\bin";
   late void terminalAdd;
 
   void _checkPostgresStatus() async {
+    if (_isManualChanging) return;
     bool processStatus = await checkProcess("postgres.exe");
     setState(() {
       status = processStatus;
@@ -34,6 +37,7 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
   }
 
   Future<void> _trigerdPostgres(bool value) async {
+    _isManualChanging = true;
     if (value) {
       final process = await Process.start(
         "$postgresPath\\postgres.exe",
@@ -56,15 +60,24 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
         status = false;
       });
     }
+    Future.delayed(const Duration(seconds: 2), () {
+      _isManualChanging = false;
+    });
   }
 
   @override
   void initState() {
     _checkPostgresStatus();
-    Timer.periodic(Duration(seconds: 2), (timer) {
+    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _checkPostgresStatus();
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    super.dispose();
   }
 
   @override

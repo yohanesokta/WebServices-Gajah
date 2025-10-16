@@ -17,6 +17,8 @@ class HttpdControl extends StatefulWidget {
 
 class _HttpdControlState extends State<HttpdControl> {
   bool status = false;
+  bool _isManualChanging = false;
+  Timer? _statusTimer;
 
   Future<void> sendTerminal(String message) async {
     final terminalAdd = Provider.of<Terminalcontext>(
@@ -27,6 +29,7 @@ class _HttpdControlState extends State<HttpdControl> {
   }
 
   void _checkHttpdStatus() async {
+    if (_isManualChanging) return;
     bool httpdIsRun = await checkProcess('httpd.exe');
     setState(() {
       status = httpdIsRun;
@@ -52,19 +55,30 @@ class _HttpdControlState extends State<HttpdControl> {
 
       sendTerminal("Memulai Httpd :$port\nBerhasil!");
     }
+    if (mounted) {
+      setState(() {
+        status = value;
+      });
+    }
 
-    setState(() {
-      status = value;
+    Future.delayed(Duration(seconds: 2), () {
+      _isManualChanging = false;
     });
   }
 
   @override
   void initState() {
     _checkHttpdStatus();
-    Timer.periodic(Duration(seconds: 2), (timer) {
+    _statusTimer = Timer.periodic(Duration(seconds: 2), (timer) {
       _checkHttpdStatus();
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -127,7 +141,7 @@ class _HttpdControlState extends State<HttpdControl> {
                       final SharedPreferences preferences =
                           await SharedPreferences.getInstance();
                       String port =
-                          preferences.getString("httpdPort") ?? "8080";
+                          preferences.getString("httpdPort") ?? "80";
                       final Uri url = Uri.parse("http://localhost:$port");
                       await launchUrl(url);
                     },
