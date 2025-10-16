@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gajahweb/components/service_control_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
@@ -12,10 +12,10 @@ class Nginxcontrol extends StatefulWidget {
   const Nginxcontrol({super.key});
 
   @override
-  State<Nginxcontrol> createState() => _Nginxcontrol();
+  State<Nginxcontrol> createState() => _NginxcontrolState();
 }
 
-class _Nginxcontrol extends State<Nginxcontrol> {
+class _NginxcontrolState extends State<Nginxcontrol> {
   bool status = false;
   bool _isManualChanging = false;
   Timer? _statusTimer;
@@ -31,16 +31,18 @@ class _Nginxcontrol extends State<Nginxcontrol> {
   void _checkNginxStatus() async {
     if (_isManualChanging) return;
     bool nginxIsRun = await checkProcess('nginx.exe');
-    setState(() {
-      status = nginxIsRun;
-    });
+    if (mounted) {
+      setState(() {
+        status = nginxIsRun;
+      });
+    }
   }
 
   Future<void> _startNginx(bool value) async {
     _isManualChanging = true;
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String port = preferences.getString("nginxPort") ?? "80";
-    final webservicePath = "C:\\gajahweb";
+    const webservicePath = 'C:\\gajahweb';
     if (status) {
       await Process.run(
         "$webservicePath\\nginx\\nginx.exe",
@@ -54,13 +56,13 @@ class _Nginxcontrol extends State<Nginxcontrol> {
       await Process.start(
         "$webservicePath\\nginx\\nginx.exe",
         ["-p", "$webservicePath\\nginx"],
-        mode: ProcessStartMode.normal,
+        mode: ProcessStartMode.detached,
         runInShell: false,
       );
       await Process.start(
         "$webservicePath\\php\\php-cgi.exe",
         ["-b", "127.0.0.1:9000"],
-        mode: ProcessStartMode.normal,
+        mode: ProcessStartMode.detached,
         runInShell: false,
       );
       sendTerminal("Memulai Nginx :$port\nMemulai php-cgi.exe :9000\nBerhasil!");
@@ -70,18 +72,25 @@ class _Nginxcontrol extends State<Nginxcontrol> {
         status = value;
       });
     }
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 2), () {
       _isManualChanging = false;
     });
   }
 
+  void _launchUrl() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    String port = preferences.getString("nginxPort") ?? "80";
+    final Uri url = Uri.parse("http://localhost:$port");
+    await launchUrl(url);
+  }
+
   @override
   void initState() {
+    super.initState();
     _checkNginxStatus();
     _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _checkNginxStatus();
     });
-    super.initState();
   }
 
   @override
@@ -92,76 +101,14 @@ class _Nginxcontrol extends State<Nginxcontrol> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromARGB(255, 59, 69, 206),
-                const Color.fromARGB(255, 32, 145, 238),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 10,
-            children: [
-              Image(
-                image: AssetImage("assets/nginx.png"),
-                width: 32,
-                height: 32,
-              ),
-              Text(
-                "Nginx Server",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-              Switch(
-                activeThumbColor: const Color.fromARGB(255, 14, 175, 9),
-                value: status,
-                onChanged: (value) {
-                  _startNginx(value);
-                },
-              ),
-            ],
-          ),
-        ),
-
-        (status)
-            ? Positioned(
-                top: 5,
-                right: 5,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: const Color.fromARGB(69, 255, 255, 255),
-                  ),
-                  padding: EdgeInsets.all(7),
-                  child: InkWell(
-                    onTap: () async {
-                      final SharedPreferences preferences = await SharedPreferences.getInstance();
-                      String port = preferences.getString("nginxPort") ?? "80";
-                      final Uri url = Uri.parse("http://localhost:$port");
-                      await launchUrl(url);
-                    },
-                    child: Icon(
-                      FontAwesomeIcons.play,
-                      size: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              )
-            : Container(),
-      ],
+    return ServiceControlCard(
+      serviceName: "Nginx",
+      statusText: status ? "Running" : "Stopped",
+      statusColor: status ? Colors.green : Colors.red,
+      value: status,
+      onChanged: _startNginx,
+      onLaunch: status ? _launchUrl : null,
+      imageAsset: "assets/nginx.png",
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gajahweb/components/service_control_card.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:gajahweb/utils/process.dart';
@@ -18,14 +18,15 @@ class _RediscontrolState extends State<Rediscontrol> {
   bool _isManualChanging = false;
   Timer? _statusTimer;
   final redisPath = "C:\\gajahweb\\redis";
-  late void terminalAdd;
 
   void _checkRedisStatus() async {
     if (_isManualChanging) return;
     bool processStatus = await checkProcess("redis-server.exe");
-    setState(() {
-      status = processStatus;
-    });
+    if (mounted) {
+      setState(() {
+        status = processStatus;
+      });
+    }
   }
 
   Future<void> sendTerminal(String message) async {
@@ -36,29 +37,29 @@ class _RediscontrolState extends State<Rediscontrol> {
     terminalAdd(message);
   }
 
-  Future<void> _trigerdRedis(bool value) async {
+  Future<void> _triggerRedis(bool value) async {
     _isManualChanging = true;
     if (value) {
-      final process = await Process.start(
+      await Process.start(
         "$redisPath\\redis-server.exe",
         [],
         runInShell: false,
-        mode: ProcessStartMode.normal,
+        mode: ProcessStartMode.detached,
         workingDirectory: redisPath,
       );
-      process.stdout.transform(systemEncoding.decoder).listen((data) {
-        sendTerminal(data);
-      });
-      setState(() {
-        status = true;
-      });
+      // process.stdout.transform(systemEncoding.decoder).listen((data) {
+      //   sendTerminal(data);
+      // });
+      sendTerminal("Berhasil Menjalankan Redis Server [redis-server.exe]");
     } else {
       await killProcess("redis-server.exe");
       sendTerminal(
         "Menghentikan Proses [redis-server.exe]\nBerhasil Dilakukan!",
       );
+    }
+    if (mounted) {
       setState(() {
-        status = false;
+        status = value;
       });
     }
     Future.delayed(const Duration(seconds: 2), () {
@@ -66,13 +67,23 @@ class _RediscontrolState extends State<Rediscontrol> {
     });
   }
 
+  void _launchRedisCli() async {
+    await Process.start(
+      "cmd.exe",
+      ["/c", "start", "redis-cli.exe"],
+      workingDirectory: redisPath,
+      runInShell: true,
+      mode: ProcessStartMode.detached,
+    );
+  }
+
   @override
   void initState() {
+    super.initState();
     _checkRedisStatus();
     _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _checkRedisStatus();
     });
-    super.initState();
   }
 
   @override
@@ -83,73 +94,15 @@ class _RediscontrolState extends State<Rediscontrol> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 47, 29, 122),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 10,
-            children: [
-              Image(
-                image: AssetImage("assets/redis.png"),
-                width: 32,
-                height: 32,
-              ),
-              Text(
-                "Redis Server",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-              Switch(
-                activeThumbColor: const Color.fromARGB(255, 14, 175, 9),
-                value: status,
-                onChanged: (value) {
-                  _trigerdRedis(value);
-                },
-              ),
-            ],
-          ),
-        ),
-
-        (status)
-            ? Positioned(
-                top: 5,
-                right: 5,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: const Color.fromARGB(69, 255, 255, 255),
-                  ),
-                  padding: EdgeInsets.all(7),
-                  child: InkWell(
-                    onTap: () async {
-                      String pathRedis = "C:\\gajahweb\\redis";
-                      await Process.start(
-                        "cmd.exe",
-                        ["/c", "start", "redis-cli.exe"],
-                        workingDirectory: pathRedis,
-                        runInShell: true,
-                        mode: ProcessStartMode.detached,
-                      );
-                    },
-                    child: Icon(
-                      FontAwesomeIcons.play,
-                      size: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              )
-            : Container(),
-      ],
+    return ServiceControlCard(
+      serviceName: "Redis",
+      statusText: status ? "Running" : "Stopped",
+      statusColor: status ? Colors.green : Colors.red,
+      value: status,
+      onChanged: _triggerRedis,
+      onLaunch: status ? _launchRedisCli : null,
+      imageAsset: "assets/redis.png",
     );
   }
 }
+

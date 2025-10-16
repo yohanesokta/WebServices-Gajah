@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gajahweb/components/service_control_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gajahweb/utils/terminal_context.dart';
@@ -32,11 +32,9 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
   }
 
   Future<void> _triggerMariaDB(bool value) async {
-    setState(() {
-      _isManualChanging = true;
-    });
+    _isManualChanging = true;
     try {
-      final mysqlPath = "C:\\gajahweb\\mariadb";
+      const mysqlPath = "C:\\gajahweb\\mariadb";
       if (status) {
         killProcess('mysqld.exe');
         sendTerminal("Mematikan proses mysqld.exe\nBerhasil");
@@ -67,11 +65,11 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
     if (_isManualChanging) return;
 
     bool mysqldProcess = await checkProcess('mysqld.exe');
+    if (!mounted) return; // Early exit if not mounted
+
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String mariadbPort = preferences.getString("mariadbPort") ?? "3306";
     bool isPortInUse = !await isPortAvailable(mariadbPort);
-
-    if (!mounted) return;
 
     if (isPortInUse && !mysqldProcess) {
       if (!_dialogShown) {
@@ -93,28 +91,41 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
           "Peringatan: Proses mysqld.exe berjalan tetapi tidak menggunakan port $mariadbPort. Proses akan dihentikan.",
         );
         await killProcess("mysqld.exe");
-        mysqldProcess = false;
+        mysqldProcess = false; // Update status after killing
       }
     } else if (!mysqldProcess) {
       if (_dialogShown) {
-        setState(() {
-          _dialogShown = false;
-        });
+        if (mounted) {
+          setState(() {
+            _dialogShown = false;
+          });
+        }
       }
     }
 
-    setState(() {
-      status = mysqldProcess;
-    });
+    if (mounted) {
+      setState(() {
+        status = mysqldProcess;
+      });
+    }
+  }
+
+  void _launchPhpMyAdmin() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    String port = preferences.getString("nginxPort") ?? "80";
+    final Uri url = Uri.parse(
+      "http://localhost:$port/phpmyadmin",
+    );
+    await launchUrl(url);
   }
 
   @override
   void initState() {
+    super.initState();
     _checkMariadbStatus();
     _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _checkMariadbStatus();
     });
-    super.initState();
   }
 
   @override
@@ -125,77 +136,14 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromARGB(255, 110, 59, 206),
-                const Color.fromARGB(255, 63, 13, 129),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 10,
-            children: [
-              Image(
-                image: AssetImage("assets/mariadb.png"),
-                width: 60,
-                height: 32,
-              ),
-              Text(
-                "Mariadb Server",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-              Switch(
-                value: status,
-                onChanged: (value) {
-                  _triggerMariaDB(value);
-                },
-              ),
-            ],
-          ),
-        ),
-        (status)
-            ? Positioned(
-                top: 5,
-                right: 5,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: const Color.fromARGB(69, 255, 255, 255),
-                  ),
-                  padding: EdgeInsets.all(7),
-                  child: InkWell(
-                    onTap: () async {
-                      final SharedPreferences preferences =
-                          await SharedPreferences.getInstance();
-                      String port = preferences.getString("nginxPort") ?? "80";
-                      final Uri url = Uri.parse(
-                        "http://localhost:$port/phpmyadmin",
-                      );
-                      await launchUrl(url);
-                    },
-                    child: Icon(
-                      FontAwesomeIcons.play,
-                      size: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              )
-            : Container(),
-      ],
+    return ServiceControlCard(
+      serviceName: "MariaDB",
+      statusText: status ? "Running" : "Stopped",
+      statusColor: status ? Colors.green : Colors.red,
+      value: status,
+      onChanged: _triggerMariaDB,
+      onLaunch: status ? _launchPhpMyAdmin : null,
+      imageAsset: "assets/mariadb.png",
     );
   }
 }

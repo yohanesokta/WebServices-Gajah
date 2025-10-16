@@ -35,39 +35,32 @@ class _SettingsState extends State<Settings> {
         preferences.getString("postgresqlPort") ?? "5473";
 
     if (nginxPort != _nginxPort.text) {
-      await Process.start(
+      await Process.run(
         "cmd.exe",
         ['/c', 'nginx-port.bat', _nginxPort.text, _htdocsPath],
         runInShell: true,
-        mode: ProcessStartMode.detached,
         workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
       );
-      killProcess('nginx.exe');
       await preferences.setString('nginxPort', _nginxPort.text);
     }
 
     if (mariadbPort != _mariadbPort.text) {
-      await Process.start(
+      await Process.run(
         "cmd.exe",
         ['/c', 'mariadb-port.bat', _mariadbPort.text],
         runInShell: true,
-        mode: ProcessStartMode.detached,
         workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
       );
-      killProcess('mysqld.exe');
       await preferences.setString("mariadbPort", _mariadbPort.text);
     }
 
     if (postgresqlPort != _postgresqlPort.text) {
-      await Process.start(
+      await Process.run(
         "cmd.exe",
         ["/c", "postgres-port.bat", _postgresqlPort.text],
-        mode: ProcessStartMode.detached,
         runInShell: true,
         workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
       );
-
-      killProcess('postgres.exe');
       await preferences.setString("postgresqlPort", _postgresqlPort.text);
     }
   }
@@ -90,149 +83,131 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1C1C1E),
       appBar: AppBar(
-        title: Row(
-          children: [
-            Text("Settings"),
-            Spacer(),
-            TextButton(
-              onPressed: () {
-                _applySettings();
-              },
-              child: Text(
-                "Apply",
-                style: TextStyle(
-                  color: const Color.fromARGB(255, 197, 197, 197),
-                ),
+        title: const Text("Settings", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF1C1C1E),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          TextButton(
+            onPressed: _applySettings,
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.blue,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
-          ],
-        ),
+            child: const Text(
+              "Apply",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          const SizedBox(width: 16),
+        ],
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          spacing: 20,
-          children: [
-            Row(
-              spacing: 10,
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _nginxPort,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: "Nginx Port",
-                      border: OutlineInputBorder(),
-                      labelStyle: TextStyle(
-                        color: const Color.fromARGB(255, 187, 187, 187),
-                      ),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _mariadbPort,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: "Mariadb Port",
-                      labelStyle: TextStyle(
-                        color: const Color.fromARGB(255, 187, 187, 187),
-                      ),
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _postgresqlPort,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: "PostgreSQL Port",
-                      labelStyle: TextStyle(
-                        color: const Color.fromARGB(255, 187, 187, 187),
-                      ),
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-              ],
+        children: [
+          _buildSectionTitle("Ports"),
+          _buildGroupedContainer([
+            _buildPortSetting("Nginx Port", _nginxPort),
+            _buildDivider(),
+            _buildPortSetting("MariaDB Port", _mariadbPort),
+            _buildDivider(),
+            _buildPortSetting("PostgreSQL Port", _postgresqlPort),
+          ]),
+          const SizedBox(height: 24),
+          _buildSectionTitle("Configuration Files"),
+          _buildGroupedContainer([
+            _buildFileLink(
+              "php.ini",
+              "\\php\\php.ini",
+              Icons.article_outlined,
             ),
+            _buildDivider(),
+            _buildFileLink(
+              "nginx.conf",
+              "\\nginx\\conf\\nginx.conf",
+              Icons.settings_ethernet_outlined,
+            ),
+            _buildDivider(),
+            _buildFileLink(
+              "my.ini",
+              "\\mariadb\\data\\my.ini",
+              Icons.storage_outlined,
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
 
-            Row(
-              spacing: 10,
-              children: [
-                InkWell(
-                  onTap: () {
-                    _openFilesNotepad("\\php\\php.ini");
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 51, 51, 51),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Row(
-                      spacing: 5,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.file_open, color: Colors.amber),
-                        Text("php.ini", style: TextStyle(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    _openFilesNotepad("\\nginx\\conf\\nginx.conf");
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 51, 51, 51),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Row(
-                      spacing: 5,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.file_open, color: Colors.amber),
-                        Text(
-                          "nginx.conf",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    _openFilesNotepad("\\mariadb\\data\\my.ini");
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 51, 51, 51),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Row(
-                      spacing: 5,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.file_open, color: Colors.amber),
-                        Text("my.ini", style: TextStyle(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
+      child: Text(
+        title.toUpperCase(),
+        style: const TextStyle(
+          color: Colors.grey,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
         ),
       ),
+    );
+  }
+
+  Widget _buildGroupedContainer(List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF2C2C2E),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: children,
+      ),
+    );
+  }
+
+  Widget _buildPortSetting(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        children: [
+          Expanded(child: Text(label, style: const TextStyle(fontSize: 16, color: Colors.white))),
+          SizedBox(
+            width: 80,
+            child: TextField(
+              controller: controller,
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+              ),
+              keyboardType: TextInputType.number,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFileLink(String title, String path, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.grey),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      onTap: () => _openFilesNotepad(path),
+    );
+  }
+
+  Widget _buildDivider() {
+    return const Divider(
+      height: 1,
+      indent: 16,
+      endIndent: 0,
+      color: Color(0xFF38383A),
     );
   }
 }

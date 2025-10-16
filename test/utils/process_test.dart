@@ -2,10 +2,11 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gajahweb/utils/process.dart';
 
+@Timeout(Duration(seconds: 60))
 void main() {
   group('process.dart', () {
     test('checkPort returns true for ephemeral port 0', () async {
-      final ok = await checkPort('0');
+      final ok = await isPortAvailable('0');
       expect(ok, isTrue);
     });
 

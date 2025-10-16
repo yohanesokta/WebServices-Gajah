@@ -12,7 +12,7 @@ void main() {
 
     tc.add('hello');
 
-    expect(tc.terminalContext.contains('hello'), isTrue);
+    expect(tc.terminalContext.contains('Process: hello'), isTrue);
     expect(notified, isTrue);
   });
 }
