@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gajahweb/components/service_control_card.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:gajahweb/utils/process.dart';
@@ -18,14 +18,15 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
   bool _isManualChanging = false;
   Timer? _statusTimer;
   final postgresPath = "C:\\gajahweb\\postgres\\bin";
-  late void terminalAdd;
 
   void _checkPostgresStatus() async {
     if (_isManualChanging) return;
     bool processStatus = await checkProcess("postgres.exe");
-    setState(() {
-      status = processStatus;
-    });
+    if (mounted) {
+      setState(() {
+        status = processStatus;
+      });
+    }
   }
 
   Future<void> sendTerminal(String message) async {
@@ -36,28 +37,24 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
     terminalAdd(message);
   }
 
-  Future<void> _trigerdPostgres(bool value) async {
+  Future<void> _triggerPostgres(bool value) async {
     _isManualChanging = true;
     if (value) {
-      final process = await Process.start(
+       await Process.start(
         "$postgresPath\\postgres.exe",
-        ["-D", "$postgresPath\\data"],
+        ["-D", "C:\\gajahweb\\postgres\\data"],
         runInShell: false,
-        mode: ProcessStartMode.normal,
+        mode: ProcessStartMode.detached,
         workingDirectory: postgresPath,
       );
-      process.stdout.transform(systemEncoding.decoder).listen((data) {
-        sendTerminal(data);
-      });
-      setState(() {
-        sendTerminal("Berhasil Menjalankan Postgresql Server [postgres.exe]");
-        status = true;
-      });
+      sendTerminal("Berhasil Menjalankan Postgresql Server [postgres.exe]");
     } else {
       await killProcess("postgres.exe");
       sendTerminal("Menghentikan Proses [postgres.exe]\nBerhasil Dilakukan!");
+    }
+    if (mounted) {
       setState(() {
-        status = false;
+        status = value;
       });
     }
     Future.delayed(const Duration(seconds: 2), () {
@@ -65,13 +62,23 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
     });
   }
 
+  void _launchPsql() async {
+    await Process.start(
+      "cmd.exe",
+      ["/c", "start", "psql.exe", "-U", "postgres"],
+      workingDirectory: postgresPath,
+      runInShell: true,
+      mode: ProcessStartMode.detached,
+    );
+  }
+
   @override
   void initState() {
+    super.initState();
     _checkPostgresStatus();
     _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _checkPostgresStatus();
     });
-    super.initState();
   }
 
   @override
@@ -82,73 +89,14 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 47, 29, 122),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            spacing: 10,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Image(
-                image: AssetImage("assets/postgre.png"),
-                width: 32,
-                height: 32,
-              ),
-              Text(
-                "PostgreSQL Server",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-              Switch(
-                activeThumbColor: const Color.fromARGB(255, 14, 175, 9),
-                value: status,
-                onChanged: (value) {
-                  _trigerdPostgres(value);
-                },
-              ),
-            ],
-          ),
-        ),
-
-        (status)
-            ? Positioned(
-                top: 5,
-                right: 5,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: const Color.fromARGB(69, 255, 255, 255),
-                  ),
-                  padding: EdgeInsets.all(7),
-                  child: InkWell(
-                    onTap: () async {
-                      String pathRedis = "C:\\gajahweb\\postgres\\bin";
-                      await Process.start(
-                        "cmd.exe",
-                        ["/c", "start", "psql.exe", "-U", "postgres"],
-                        workingDirectory: pathRedis,
-                        runInShell: true,
-                        mode: ProcessStartMode.detached,
-                      );
-                    },
-                    child: Icon(
-                      FontAwesomeIcons.play,
-                      size: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              )
-            : Container(),
-      ],
+    return ServiceControlCard(
+      serviceName: "PostgreSQL",
+      statusText: status ? "Running" : "Stopped",
+      statusColor: status ? Colors.green : Colors.red,
+      value: status,
+      onChanged: _triggerPostgres,
+      onLaunch: status ? _launchPsql : null,
+      imageAsset: "assets/postgre.png",
     );
   }
 }

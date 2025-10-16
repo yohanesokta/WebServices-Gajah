@@ -18,22 +18,22 @@ void main() async {
   await configureNetworkTools(appDirectory.path, enableDebugging: true);
 
   WindowOptions windowOptions = const WindowOptions(
-    size: Size(590, 550),
+    size: Size(580, 700), // Adjusted for the new fixed layout
     center: true,
-    title: "Gajah Webserver",
+    title: "Gajah Control Panel",
   );
 
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
     await windowManager.focus();
-    await windowManager.setMaximizable(false);
-    await windowManager.setResizable(false);
+    await windowManager.setMaximizable(true); // Allow maximizing
+    await windowManager.setResizable(true); // Allow resizing
   });
 
   runApp(
     ChangeNotifierProvider(
       create: (context) => Terminalcontext(),
-      child: MainApp(),
+      child: const MainApp(),
     ),
   );
 }
@@ -44,30 +44,37 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Gajah Webserver",
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: const Color.fromARGB(255, 18, 18, 18),
-          titleTextStyle: TextStyle(color: Colors.white),
-          foregroundColor: Colors.white,
+      title: "Gajah Control Panel",
+      themeMode: ThemeMode.dark, // Enforce dark theme
+      darkTheme: ThemeData.dark().copyWith(
+        primaryColor: Colors.blueGrey,
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1F1F1F),
+          elevation: 0,
         ),
-        scaffoldBackgroundColor: const Color.fromARGB(255, 18, 18, 18),
-        scrollbarTheme: ScrollbarThemeData(
-          thumbColor: WidgetStateProperty.all(Colors.blue), // warna thumb
-          trackColor: WidgetStateProperty.all(Colors.grey[300]),
-          trackBorderColor: WidgetStateProperty.all(Colors.grey),
+        cardTheme:  CardThemeData(
+          elevation: 2.0,
+          shape: RoundedRectangleBorder(
+            borderRadius:  BorderRadius.circular(12.0),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.blueAccent,
+          ),
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: HomeApp(),
+      home: const HomeApp(),
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case "/about":
-            return SlideLeftRoute(page: AboutPage());
+            return SlideLeftRoute(page: const AboutPage());
           case "/download":
-            return SlideLeftRoute(page: Download());
+            return SlideLeftRoute(page: const Download());
           case "/settings":
-            return SlideLeftRoute(page: Settings());
+            return SlideLeftRoute(page: const Settings());
         }
         return null;
       },

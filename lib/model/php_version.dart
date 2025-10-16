@@ -13,7 +13,8 @@ class Phpversion {
   }
 }
 
-Future<List<Phpversion>?> getDataVersion(bool stable) async {
+Future<List<Phpversion>?> getDataVersion(bool stable, {http.Client? client}) async {
+  client ??= http.Client();
   try {
     final Uri url = (stable)
         ? Uri.parse(
@@ -22,10 +23,9 @@ Future<List<Phpversion>?> getDataVersion(bool stable) async {
         : Uri.parse(
             "https://yohanesokta.github.io/WebServices-Gajah/api/php-archive.json",
           );
-    var response = await http.get(url);
+    var response = await client.get(url);
     if (response.statusCode != 200) {
-    // print("fail get php version");
-      return null;
+      throw Exception('Failed to load php version');
     }
     List<dynamic> data = (jsonDecode(response.body) as List<dynamic>);
     final List<Phpversion> phpversion = data
@@ -33,7 +33,6 @@ Future<List<Phpversion>?> getDataVersion(bool stable) async {
         .toList();
     return phpversion;
   } catch (error) {
-    // print(e);
-    return null;
+    throw Exception('Failed to load php version');
   }
 }
