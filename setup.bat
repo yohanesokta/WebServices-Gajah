@@ -34,6 +34,7 @@ echo "Download PHP 8.4.11 [2 of 7]"
 wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-8.4.11-Win32-vs17-x64.zip -O %OUTDIR%\var\php-8.4.11.zip
 unzip.exe -o %OUTDIR%\var\php-8.4.11.zip -d %OUTDIR%\php
 copy "%OUTDIR%\config\php.ini" "%OUTDIR%\php\php.ini"
+mkdir %OUTDIR%\php\tmp 
 
 :mariadb
 if exist "%OUTDIR%\mariadb" ( 
@@ -96,6 +97,7 @@ del /f /q %OUTDIR%\php-8.4.11.zip
 del /f /q %OUTDIR%\phpMyAdmin.zip
 del /f /q %OUTDIR%\heidisql.zip
 del /f /q %OUTDIR%\postgres.zip
+del /f /q %OUTDIR%\apache.zip
 
 del /f /q %OUTDIR%\redis.zip
 rmdir /s /q %OUTDIR%\tmp

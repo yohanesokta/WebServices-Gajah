@@ -39,7 +39,11 @@ goto nginxstop
 :nginxstop
 cd %outdir%\nginx\
 nginx.exe -s stop
+taskkill /F /IM httpd.exe
+taskkill /F /IM nginx.exe
+taskkill /F /IM php-cgi.exe
 
 :caching
+mkdir %outdir%\php\tmp
 rmdir /s /q %outdir%\config
 echo %1 >> %outdir%\install.log

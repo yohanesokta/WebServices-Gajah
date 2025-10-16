@@ -18,7 +18,8 @@ void main() async {
   await configureNetworkTools(appDirectory.path, enableDebugging: true);
 
   WindowOptions windowOptions = const WindowOptions(
-    size: Size(580, 700), // Adjusted for the new fixed layout
+    size: Size(580, 700),
+    minimumSize: Size(570, 530),
     center: true,
     title: "Gajah Control Panel",
   );

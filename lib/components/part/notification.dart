@@ -8,7 +8,7 @@ Future<bool> showConfirmDialog(BuildContext context, String message) async {
           return AlertDialog(
             title: const Center(
               child: Text(
-                'Tampaknya',
+                'Information',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),

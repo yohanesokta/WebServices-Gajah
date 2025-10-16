@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gajahweb/utils/process.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -15,6 +14,7 @@ class _SettingsState extends State<Settings> {
   final TextEditingController _mariadbPort = TextEditingController();
   final TextEditingController _postgresqlPort = TextEditingController();
   String _htdocsPath = "C:\\gajahweb\\htdocs";
+  bool onEdits = false;
 
   late SharedPreferences preferences;
 
@@ -29,11 +29,12 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _applySettings() async {
+    print("Applying settings...");
     final String nginxPort = preferences.getString("nginxPort") ?? "80";
     final String mariadbPort = preferences.getString("mariadbPort") ?? "3306";
     final String postgresqlPort =
         preferences.getString("postgresqlPort") ?? "5473";
-
+   
     if (nginxPort != _nginxPort.text) {
       await Process.run(
         "cmd.exe",
@@ -63,6 +64,10 @@ class _SettingsState extends State<Settings> {
       );
       await preferences.setString("postgresqlPort", _postgresqlPort.text);
     }
+
+     setState(() {
+      onEdits = false;
+    });
   }
 
   Future<void> _openFilesNotepad(String filePath) async {
@@ -93,7 +98,7 @@ class _SettingsState extends State<Settings> {
           TextButton(
             onPressed: _applySettings,
             style: TextButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: (onEdits) ? Colors.blue : Colors.grey,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -124,18 +129,28 @@ class _SettingsState extends State<Settings> {
               "php.ini",
               "\\php\\php.ini",
               Icons.article_outlined,
+              "PHP configuration file",
             ),
             _buildDivider(),
             _buildFileLink(
               "nginx.conf",
               "\\nginx\\conf\\nginx.conf",
               Icons.settings_ethernet_outlined,
+              "Nginx configuration file",
             ),
             _buildDivider(),
             _buildFileLink(
               "my.ini",
               "\\mariadb\\data\\my.ini",
               Icons.storage_outlined,
+              "MariaDB configuration file",
+            ),
+            _buildDivider(),
+            _buildFileLink(
+              "httpd.conf",
+              "\\apache\\conf\\httpd.conf",
+              Icons.settings_applications_outlined,
+              "Apache configuration file",
             ),
           ]),
         ],
@@ -178,6 +193,11 @@ class _SettingsState extends State<Settings> {
           SizedBox(
             width: 80,
             child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  onEdits = true;
+                });
+              },
               controller: controller,
               textAlign: TextAlign.right,
               style: const TextStyle(fontSize: 16, color: Colors.white),
@@ -193,10 +213,11 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  Widget _buildFileLink(String title, String path, IconData icon) {
+  Widget _buildFileLink(String title, String path, IconData icon, String subtitle) {
     return ListTile(
       leading: Icon(icon, color: Colors.grey),
       title: Text(title, style: const TextStyle(color: Colors.white)),
+      subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
       onTap: () => _openFilesNotepad(path),
     );
