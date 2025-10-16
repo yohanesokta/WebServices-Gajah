@@ -26,10 +26,9 @@ class _InformationState extends State<Information> {
       context,
       listen: false,
     );
-
-    final bool mariadbStatus = await checkPort(mariadbPort);
-    final bool nginxStatus = await checkPort(nginxPort);
-
+    final bool mariadbStatus = await isPortAvailable(mariadbPort);
+    final bool nginxStatus = await isPortAvailable(nginxPort);
+  
     if (!nginxStatus) {
       terminalContext.add("$nginxPort : port nginx telah di gunakan!");
     }
@@ -37,7 +36,6 @@ class _InformationState extends State<Information> {
       terminalContext.add("$mariadbPort : port mariadb telah di gunakan");
     }
   }
-
   @override
   void initState() {
     _checkingUsedPort();

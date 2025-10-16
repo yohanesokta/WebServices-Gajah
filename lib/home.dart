@@ -30,14 +30,25 @@ class _HomeAppState extends State<HomeApp> {
         title: Row(
           spacing: 10,
           children: [
-            Icon(Icons.home_filled, color: Colors.white),
-            Text(
-              "Control Panel",
+            Icon(Icons.settings, color: Colors.white),
+            Row(
+              children: [
+               
+                Text(
+              "Control Panel ",
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
-              ),
+              )),
+               Text(
+              "Beta Version",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: const Color.fromARGB(255, 112, 162, 248),
+              )),
+              ],
             ),
             Spacer(),
             IconButton(

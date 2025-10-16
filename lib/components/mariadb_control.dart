@@ -19,7 +19,9 @@ class Mariadbcontrol extends StatefulWidget {
 
 class _MariadbcontrolState extends State<Mariadbcontrol> {
   bool status = false;
-  bool _isTrigger = false;
+  bool _isManualChanging = false;
+  Timer? _statusTimer;
+  bool _dialogShown = false;
 
   Future<void> sendTerminal(String message) async {
     final terminalAdd = Provider.of<Terminalcontext>(
@@ -29,9 +31,9 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
     terminalAdd(message);
   }
 
-  Future<void> _triggerMariaDB() async {
+  Future<void> _triggerMariaDB(bool value) async {
     setState(() {
-      _isTrigger = true;
+      _isManualChanging = true;
     });
     try {
       final mysqlPath = "C:\\gajahweb\\mariadb";
@@ -50,43 +52,75 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
     } catch (error) {
       // print(e);
     }
+    if (mounted) {
+      setState(() {
+        status = value;
+      });
+    }
+
+    Future.delayed(const Duration(seconds: 2), () {
+      _isManualChanging = false;
+    });
   }
 
   void _checkMariadbStatus() async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    String mariadb = preferences.getString("mariadbPort") ?? "3306";
+    if (_isManualChanging) return;
 
     bool mysqldProcess = await checkProcess('mysqld.exe');
-    if (_isTrigger) {
-      _isTrigger = false;
-    } else {
-      bool checkActive = await checkPort(mariadb);
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    String mariadbPort = preferences.getString("mariadbPort") ?? "3306";
+    bool isPortInUse = !await isPortAvailable(mariadbPort);
 
-      if (!mounted) return;
-      if (checkActive) {
-        if (mysqldProcess) {
-          await showConfirmDialog(
-            context,
-            "Alamak Port Digunakan Padahal aplikasi belum di start!.",
-          );
-          await killProcess("mysqld.exe");
-          return;
-        }
+    if (!mounted) return;
+
+    if (isPortInUse && !mysqldProcess) {
+      if (!_dialogShown) {
+        setState(() {
+          _dialogShown = true;
+        });
+        await showConfirmDialog(
+          context,
+          "Peringatan: Port $mariadbPort sedang digunakan oleh aplikasi lain. Harap matikan aplikasi tersebut.",
+        );
       }
-
-      setState(() {
-        status = mysqldProcess;
-      });
+    } else if (!isPortInUse && mysqldProcess) {
+      if (!_dialogShown) {
+        setState(() {
+          _dialogShown = true;
+        });
+        await showConfirmDialog(
+          context,
+          "Peringatan: Proses mysqld.exe berjalan tetapi tidak menggunakan port $mariadbPort. Proses akan dihentikan.",
+        );
+        await killProcess("mysqld.exe");
+        mysqldProcess = false;
+      }
+    } else if (!mysqldProcess) {
+      if (_dialogShown) {
+        setState(() {
+          _dialogShown = false;
+        });
+      }
     }
+
+    setState(() {
+      status = mysqldProcess;
+    });
   }
 
   @override
   void initState() {
     _checkMariadbStatus();
-    Timer.periodic(Duration(seconds: 2), (timer) {
+    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _checkMariadbStatus();
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -126,10 +160,7 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
               Switch(
                 value: status,
                 onChanged: (value) {
-                  _triggerMariaDB();
-                  setState(() {
-                    status = value;
-                  });
+                  _triggerMariaDB(value);
                 },
               ),
             ],

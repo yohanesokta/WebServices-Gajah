@@ -6,7 +6,7 @@ class Terminalcontext with ChangeNotifier {
   List<String> get terminalContext => _message;
 
   void add(String text) {
-    _message.add(text);
+    _message.add("Process: $text");
     notifyListeners();
   }
 } 

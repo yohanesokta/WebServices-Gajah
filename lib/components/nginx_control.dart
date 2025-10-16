@@ -17,6 +17,8 @@ class Nginxcontrol extends StatefulWidget {
 
 class _Nginxcontrol extends State<Nginxcontrol> {
   bool status = false;
+  bool _isManualChanging = false;
+  Timer? _statusTimer;
 
   Future<void> sendTerminal(String message) async {
     final terminalAdd = Provider.of<Terminalcontext>(
@@ -27,6 +29,7 @@ class _Nginxcontrol extends State<Nginxcontrol> {
   }
 
   void _checkNginxStatus() async {
+    if (_isManualChanging) return;
     bool nginxIsRun = await checkProcess('nginx.exe');
     setState(() {
       status = nginxIsRun;
@@ -34,9 +37,10 @@ class _Nginxcontrol extends State<Nginxcontrol> {
   }
 
   Future<void> _startNginx(bool value) async {
+    _isManualChanging = true;
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String port = preferences.getString("nginxPort") ?? "80";
-    final webservicePath = r'C:\gajahweb';
+    final webservicePath = "C:\\gajahweb";
     if (status) {
       await Process.run(
         "$webservicePath\\nginx\\nginx.exe",
@@ -61,18 +65,29 @@ class _Nginxcontrol extends State<Nginxcontrol> {
       );
       sendTerminal("Memulai Nginx :$port\nMemulai php-cgi.exe :9000\nBerhasil!");
     }
-    setState(() {
-      status = value;
+    if (mounted) {
+      setState(() {
+        status = value;
+      });
+    }
+    Future.delayed(const Duration(seconds: 5), () {
+      _isManualChanging = false;
     });
   }
 
   @override
   void initState() {
     _checkNginxStatus();
-    Timer.periodic(Duration(seconds: 2), (timer) {
+    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _checkNginxStatus();
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    super.dispose();
   }
 
   @override
