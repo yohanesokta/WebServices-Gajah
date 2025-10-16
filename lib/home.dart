@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gajahweb/components/httpd_control.dart';
 import 'package:gajahweb/components/information.dart';
+import 'package:gajahweb/components/part/notification.dart';
 import 'package:gajahweb/components/postgresql_control.dart';
 import 'package:gajahweb/components/xampp_sameless.dart';
 import 'package:gajahweb/utils/process.dart';
@@ -8,6 +9,8 @@ import 'package:gajahweb/utils/runtime.dart';
 import 'package:gajahweb/components/mariadb_control.dart';
 import 'package:gajahweb/components/nginx_control.dart';
 import 'package:gajahweb/components/redis_control.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class HomeApp extends StatefulWidget {
   const HomeApp({super.key});
@@ -37,16 +40,47 @@ class _HomeAppState extends State<HomeApp> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Control Panel",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16),),
+        title: const Text(
+          "Control Panel",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+        ),
         actions: [
+          Tooltip(
+            message: "Download PHP Versions",
+            child:
           IconButton(
             onPressed: () => Navigator.pushNamed(context, "/download"),
             icon: const Icon(Icons.download),
+          )),
+          const SizedBox(width: 10),
+          Tooltip(
+            message: "Check for Updates",
+            child: IconButton(
+              onPressed: () async {
+                    final modal = await showConfirmDialog(
+                      context,
+                      "OTA updates are not available yet. Please check the GitHub releases page for updates.",
+                    );
+
+                    if (modal) {
+                      print("Launching GitHub releases page...");
+                      final urlLauncher = Uri.parse("https://github.com/yohanesokta/WebServices-Gajah/releases");
+                      await launchUrl(urlLauncher);
+                    }
+                  },
+              icon: const Icon(Icons.update),
+            ),
           ),
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, "/settings"),
-            icon: const Icon(Icons.settings),
+          const SizedBox(width: 10),
+          Tooltip(
+            message: "Settings",
+            child: IconButton(
+              onPressed: () => Navigator.pushNamed(context, "/settings"),
+              icon: const Icon(Icons.settings),
+            ),
           ),
+          const SizedBox(width: 10),
+
         ],
       ),
       body: SingleChildScrollView(
@@ -67,8 +101,13 @@ class _HomeAppState extends State<HomeApp> {
                   const spacing = 12.0;
                   final totalItems = serviceWidgets.length;
 
-                  final crossAxisCount = (constraints.maxWidth / (cardWidth + spacing)).floor().clamp(1, totalItems);
-                  final requiredWidth = crossAxisCount * cardWidth + (crossAxisCount - 1) * spacing;
+                  final crossAxisCount =
+                      (constraints.maxWidth / (cardWidth + spacing))
+                          .floor()
+                          .clamp(1, totalItems);
+                  final requiredWidth =
+                      crossAxisCount * cardWidth +
+                      (crossAxisCount - 1) * spacing;
 
                   return Center(
                     child: SizedBox(
@@ -99,13 +138,17 @@ class _HomeAppState extends State<HomeApp> {
                   _UtilityButton(
                     label: "HeidiSQL",
                     icon: Icons.storage,
-                    onTap: () => startProgram("C:\\gajahweb\\heidisql\\heidisql.exe", []),
+                    onTap: () => startProgram(
+                      "C:\\gajahweb\\heidisql\\heidisql.exe",
+                      [],
+                    ),
                   ),
                   const SizedBox(width: 12),
                   _UtilityButton(
                     label: "Htdocs",
                     icon: Icons.folder,
-                    onTap: () => startProgram('explorer.exe', ["C:\\gajahweb\\htdocs"]),
+                    onTap: () =>
+                        startProgram('explorer.exe', ["C:\\gajahweb\\htdocs"]),
                   ),
                 ],
               ),
@@ -115,7 +158,10 @@ class _HomeAppState extends State<HomeApp> {
       ),
       bottomSheet: _isTerminalVisible
           ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 8.0,
+              ),
               child: const Information(),
             )
           : const SizedBox.shrink(),
@@ -125,10 +171,7 @@ class _HomeAppState extends State<HomeApp> {
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Row(
             children: [
-              const Text(
-                "Build v1.2",
-                style: TextStyle(fontSize: 12),
-              ),
+              const Text("Build v2.0", style: TextStyle(fontSize: 12)),
               const Spacer(),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, "/about"),
@@ -136,7 +179,11 @@ class _HomeAppState extends State<HomeApp> {
               ),
               const SizedBox(width: 8),
               IconButton(
-                icon: Icon(_isTerminalVisible ? Icons.keyboard_arrow_down : Icons.terminal),
+                icon: Icon(
+                  _isTerminalVisible
+                      ? Icons.keyboard_arrow_down
+                      : Icons.terminal,
+                ),
                 onPressed: () {
                   setState(() {
                     _isTerminalVisible = !_isTerminalVisible;
@@ -184,7 +231,10 @@ class _UtilityButton extends StatelessWidget {
               children: [
                 Icon(icon),
                 const SizedBox(width: 8),
-                Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  label,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ),
