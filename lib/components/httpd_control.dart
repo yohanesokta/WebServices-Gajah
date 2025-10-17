@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gajahweb/components/service_control_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
@@ -31,15 +31,18 @@ class _HttpdControlState extends State<HttpdControl> {
   void _checkHttpdStatus() async {
     if (_isManualChanging) return;
     bool httpdIsRun = await checkProcess('httpd.exe');
-    setState(() {
-      status = httpdIsRun;
-    });
+    if (mounted) {
+      setState(() {
+        status = httpdIsRun;
+      });
+    }
   }
 
   Future<void> _startHttpd(bool value) async {
+    _isManualChanging = true;
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String port = preferences.getString("httpdPort") ?? "8080";
-    final webservicePath = "C:\\gajahweb";
+    const webservicePath = "C:\\gajahweb";
 
     if (status) {
       await Process.run("taskkill.exe", ["/F", "/IM", "httpd.exe"]);
@@ -61,18 +64,25 @@ class _HttpdControlState extends State<HttpdControl> {
       });
     }
 
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       _isManualChanging = false;
     });
   }
 
+  void _launchUrl() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    String port = preferences.getString("httpdPort") ?? "80";
+    final Uri url = Uri.parse("http://localhost:$port");
+    await launchUrl(url);
+  }
+
   @override
   void initState() {
+    super.initState();
     _checkHttpdStatus();
-    _statusTimer = Timer.periodic(Duration(seconds: 2), (timer) {
+    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _checkHttpdStatus();
     });
-    super.initState();
   }
 
   @override
@@ -83,78 +93,14 @@ class _HttpdControlState extends State<HttpdControl> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromARGB(255, 206, 69, 59),
-                const Color.fromARGB(255, 238, 145, 32),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 10,
-            children: [
-              Image(
-                image: AssetImage("assets/httpd.png"),
-                width: 32,
-                height: 32,
-              ),
-              Text(
-                "Apache Server",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-              Switch(
-                activeThumbColor: const Color.fromARGB(255, 14, 175, 9),
-                value: status,
-                onChanged: (value) {
-                  _startHttpd(value);
-                },
-              ),
-            ],
-          ),
-        ),
-
-        (status)
-            ? Positioned(
-                top: 5,
-                right: 5,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: const Color.fromARGB(69, 255, 255, 255),
-                  ),
-                  padding: EdgeInsets.all(7),
-                  child: InkWell(
-                    onTap: () async {
-                      final SharedPreferences preferences =
-                          await SharedPreferences.getInstance();
-                      String port =
-                          preferences.getString("httpdPort") ?? "80";
-                      final Uri url = Uri.parse("http://localhost:$port");
-                      await launchUrl(url);
-                    },
-                    child: Icon(
-                      FontAwesomeIcons.play,
-                      size: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              )
-            : Container(),
-      ],
+    return ServiceControlCard(
+      serviceName: "Apache",
+      statusText: status ? "Running" : "Stopped",
+      statusColor: status ? Colors.green : Colors.red,
+      value: status,
+      onChanged: _startHttpd,
+      onLaunch: status ? _launchUrl : null,
+      imageAsset: "assets/httpd.png",
     );
   }
 }

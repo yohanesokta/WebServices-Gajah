@@ -15,6 +15,33 @@ class Information extends StatefulWidget {
 
 class _InformationState extends State<Information> {
   final ScrollController _scrollController = ScrollController();
+  late Terminalcontext _terminalContext;
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkingUsedPort();
+
+    // The listener is added after the first frame is built.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _terminalContext = context.read<Terminalcontext>();
+      _terminalContext.addListener(_scrollToBottom);
+    });
+  }
+
+  @override
+  void dispose() {
+    // The listener must be removed when the widget is disposed.
+    _terminalContext.removeListener(_scrollToBottom);
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   Future<void> _checkingUsedPort() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -22,13 +49,14 @@ class _InformationState extends State<Information> {
     String mariadbPort = preferences.getString("mariadbPort") ?? "3306";
 
     if (!mounted) return;
+
     final terminalContext = Provider.of<Terminalcontext>(
       context,
       listen: false,
     );
     final bool mariadbStatus = await isPortAvailable(mariadbPort);
     final bool nginxStatus = await isPortAvailable(nginxPort);
-  
+
     if (!nginxStatus) {
       terminalContext.add("$nginxPort : port nginx telah di gunakan!");
     }
@@ -36,49 +64,34 @@ class _InformationState extends State<Information> {
       terminalContext.add("$mariadbPort : port mariadb telah di gunakan");
     }
   }
-  @override
-  void initState() {
-    _checkingUsedPort();
-
-    WidgetsBinding.instance.addPersistentFrameCallback((_) {
-      final terminalText = context.read<Terminalcontext>();
-      terminalText.addListener(() {
-        if (_scrollController.hasClients) {
-          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-        }
-      });
-    });
-
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final text = Provider.of<Terminalcontext>(
-      context,
-      listen: true,
-    ).terminalContext;
+    final theme = Theme.of(context);
+    final terminal = context.watch<Terminalcontext>();
 
     return Container(
-      height: 70,
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      height: 120, // Increased height
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 27, 27, 27),
-        borderRadius: BorderRadius.circular(5),
+        color: theme.colorScheme.surface, // Use theme color
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5),),
       ),
-      child: ListView.builder(
-        itemCount: text.length,
-        controller: _scrollController,
-        itemBuilder: (context, index) {
-          return Text(
-            text[index],
-            style: TextStyle(
-              color: const Color.fromARGB(255, 185, 185, 185),
-              fontSize: 11,
-              height: 1,
-            ),
-          );
-        },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0), // Added padding
+        child: ListView.builder(
+          itemCount: terminal.terminalContext.length,
+          controller: _scrollController,
+          itemBuilder: (context, index) {
+            return Text(
+              terminal.terminalContext[index],
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontFamily: 'monospace',
+                height: 1.2,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

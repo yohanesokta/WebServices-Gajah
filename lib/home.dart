@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gajahweb/components/httpd_control.dart';
 import 'package:gajahweb/components/information.dart';
+import 'package:gajahweb/components/part/notification.dart';
 import 'package:gajahweb/components/postgresql_control.dart';
 import 'package:gajahweb/components/xampp_sameless.dart';
 import 'package:gajahweb/utils/process.dart';
@@ -8,6 +9,8 @@ import 'package:gajahweb/utils/runtime.dart';
 import 'package:gajahweb/components/mariadb_control.dart';
 import 'package:gajahweb/components/nginx_control.dart';
 import 'package:gajahweb/components/redis_control.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class HomeApp extends StatefulWidget {
   const HomeApp({super.key});
@@ -17,149 +20,224 @@ class HomeApp extends StatefulWidget {
 }
 
 class _HomeAppState extends State<HomeApp> {
+  bool _isTerminalVisible = false;
+
   @override
   void initState() {
-    getConfig();
     super.initState();
+    getConfig();
   }
 
   @override
   Widget build(BuildContext context) {
+    final serviceWidgets = [
+      const HttpdControl(),
+      const Nginxcontrol(),
+      const Mariadbcontrol(),
+      const Postgresqlcontrol(),
+      const Rediscontrol(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          spacing: 10,
-          children: [
-            Icon(Icons.settings, color: Colors.white),
-            Row(
-              children: [
-               
-                Text(
-              "Control Panel ",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              )),
-               Text(
-              "Beta Version",
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: const Color.fromARGB(255, 112, 162, 248),
-              )),
-              ],
+        title: const Text(
+          "Control Panel",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+        ),
+        actions: [
+          Tooltip(
+            message: "Download PHP Versions",
+            child:
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, "/download"),
+            icon: const Icon(Icons.download),
+          )),
+          const SizedBox(width: 10),
+          Tooltip(
+            message: "Check for Updates",
+            child: IconButton(
+              onPressed: () async {
+                    final modal = await showConfirmDialog(
+                      context,
+                      "OTA updates are not available yet. Please check the GitHub releases page for updates.",
+                    );
+
+                    if (modal) {
+                      print("Launching GitHub releases page...");
+                      final urlLauncher = Uri.parse("https://github.com/yohanesokta/WebServices-Gajah/releases");
+                      await launchUrl(urlLauncher);
+                    }
+                  },
+              icon: const Icon(Icons.update),
             ),
-            Spacer(),
-            IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, "/download");
-              },
-              icon: Icon(
-                Icons.download,
-                color: const Color.fromARGB(255, 157, 208, 255),
+          ),
+          const SizedBox(width: 10),
+          Tooltip(
+            message: "Settings",
+            child: IconButton(
+              onPressed: () => Navigator.pushNamed(context, "/settings"),
+              icon: const Icon(Icons.settings),
+            ),
+          ),
+          const SizedBox(width: 10),
+
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(12.0),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: _isTerminalVisible ? 140 : 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Services",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-            ),
-            IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, "/settings");
-              },
-              icon: Icon(Icons.settings, color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-      body: Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          spacing: 10,
-          children: [
-            Row(
-              spacing: 10,
-              children: [Nginxcontrol(), Mariadbcontrol(), Rediscontrol(),HttpdControl()],
-            ),
-            Row(
-              children: [Postgresqlcontrol(), Expanded(child: Xamppsameless())],
-            ),
-            Information(),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: 10,
-              children: [
-                InkWell(
-                  onTap: () {
-                    startProgram("C:\\gajahweb\\heidisql\\heidisql.exe", []);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 199, 129, 0),
-                      borderRadius: BorderRadius.circular(5),
+              const SizedBox(height: 12),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  const cardWidth = 160.0;
+                  const spacing = 12.0;
+                  final totalItems = serviceWidgets.length;
+
+                  final crossAxisCount =
+                      (constraints.maxWidth / (cardWidth + spacing))
+                          .floor()
+                          .clamp(1, totalItems);
+                  final requiredWidth =
+                      crossAxisCount * cardWidth +
+                      (crossAxisCount - 1) * spacing;
+
+                  return Center(
+                    child: SizedBox(
+                      width: requiredWidth,
+                      child: GridView.count(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: spacing,
+                        mainAxisSpacing: spacing,
+                        childAspectRatio: 1,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: serviceWidgets,
+                      ),
                     ),
-                    child: Row(
-                      spacing: 5,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.storage,
-                          color: const Color.fromARGB(255, 255, 255, 255),
-                        ),
-                        Text("HeidiSQL", style: TextStyle(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    startProgram('explorer.exe', ["C:\\gajahweb\\htdocs\\"]);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 70, 70, 70),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Row(
-                      spacing: 5,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.folder, color: Colors.amber),
-                        Text("htdocs", style: TextStyle(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        child: Row(
-          children: [
-            Text(
-              "Build v1.2",
-              style: TextStyle(fontSize: 12, color: Colors.white),
-            ),
-            Spacer(),
-            InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, "/about");
-              },
-              child: Row(
-                spacing: 3,
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                "Utilities",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              const Xamppsameless(),
+              const SizedBox(height: 12),
+              Row(
                 children: [
-                  Icon(Icons.info_outline, color: Colors.white, size: 14),
-                  Text(
-                    "About",
-                    style: TextStyle(fontSize: 12, color: Colors.white),
+                  _UtilityButton(
+                    label: "HeidiSQL",
+                    icon: Icons.storage,
+                    onTap: () => startProgram(
+                      "C:\\gajahweb\\heidisql\\heidisql.exe",
+                      [],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _UtilityButton(
+                    label: "Htdocs",
+                    icon: Icons.folder,
+                    onTap: () =>
+                        startProgram('explorer.exe', ["C:\\gajahweb\\htdocs"]),
                   ),
                 ],
               ),
+            ],
+          ),
+        ),
+      ),
+      bottomSheet: _isTerminalVisible
+          ? Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 8.0,
+              ),
+              child: const Information(),
+            )
+          : const SizedBox.shrink(),
+      bottomNavigationBar: SizedBox(
+        height: 35.0,
+        child: BottomAppBar(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: Row(
+            children: [
+              const Text("Build v2.0", style: TextStyle(fontSize: 12)),
+              const Spacer(),
+              TextButton(
+                onPressed: () => Navigator.pushNamed(context, "/about"),
+                child: const Text("About"),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: Icon(
+                  _isTerminalVisible
+                      ? Icons.keyboard_arrow_down
+                      : Icons.terminal,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isTerminalVisible = !_isTerminalVisible;
+                  });
+                },
+                tooltip: _isTerminalVisible ? "Hide Logging" : "Show Logging",
+                iconSize: 20,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UtilityButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _UtilityButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Card(
+        elevation: 2.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12.0),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
