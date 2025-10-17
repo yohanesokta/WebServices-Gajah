@@ -1,12 +1,8 @@
 [
+
     {
-        "name" : "php-8.5.0beta2-x64TS",
-        "url"  : "https://windows.php.net/downloads/qa/php-8.5.0beta2-Win32-vs17-x86.zip",
-        "type" : "universal"
-    },
-    {
-        "name" : "php-8.5.0beta2-x86NTS",
-        "url" : "https://windows.php.net/downloads/qa/php-8.5.0beta2-nts-Win32-vs17-x86.zip",
+        "name" : "php-8.5.0RC2-x64NTS",
+        "url" : "https://windows.php.net/downloads/qa/php-8.5.0RC2-nts-Win32-vs17-x64.zip",
         "type" : "universal"
      },
     {
