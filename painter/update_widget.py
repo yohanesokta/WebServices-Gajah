@@ -1,10 +1,23 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, 
-                             QProgressBar, QLabel, QHBoxLayout, 
+from PyQt6.QtWidgets import ( QWidget, QVBoxLayout, QPushButton, 
+                             QProgressBar, QLabel, QHBoxLayout,
                              QGraphicsDropShadowEffect)
-from PyQt6.QtCore import Qt, QPropertyAnimation, QTimer
-from PyQt6.QtGui import QColor , QMouseEvent
+from PyQt6.QtCore import Qt, QPropertyAnimation, QTimer, QPoint , QObject, QThread
+from PyQt6.QtGui import QColor, QMouseEvent
 from enum import Enum
-from painter.runner.download import Downloader
+from painter.update_request import RequestUpdatesWorker
+
+from painter.runner.download import Downloader 
+
+class Downloader(QObject): 
+    from PyQt6.QtCore import pyqtSignal
+    progress = pyqtSignal(int)
+    finished = pyqtSignal()
+    def __init__(self, url, output):
+        super().__init__(); self._progress = 0; self._timer = QTimer(self); self._timer.timeout.connect(self._update)
+    def start(self): self._progress = 0; self._timer.start(50)
+    def _update(self):
+        if self._progress < 100: self._progress += 1; self.progress.emit(self._progress)
+        else: self._timer.stop(); self.finished.emit()
 
 class UpdateState(Enum):
     """Mendefinisikan status-status yang mungkin terjadi pada widget."""
@@ -12,26 +25,27 @@ class UpdateState(Enum):
     UPDATE_AVAILABLE = 2
     NO_UPDATE = 3
     DOWNLOADING = 4
-    COMPLETED = 5
-    ERROR = 6
+    COMPLETED = 5       # Download selesai, siap install
+    INSTALLING = 6      # <-- BARU: Sedang menginstall
+    ALL_DONE = 7        # <-- BARU: Semua proses selesai
+    ERROR = 8
 
 class UpdateWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.drag_pos = QPoint()
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         
-        self.setFixedSize(400, 160)
+        self.setFixedSize(400, 180)
         self.current_state = None
 
-        # --- UI Elements ---
         shadow_effect = QGraphicsDropShadowEffect(self)
-        shadow_effect.setBlurRadius(30)
-        shadow_effect.setOffset(0, 5)
+        shadow_effect.setBlurRadius(30); shadow_effect.setOffset(0, 5)
         shadow_effect.setColor(QColor(0, 0, 0, 160))
 
         self.container = QWidget(self)
-        self.container.setObjectName("container") # Beri nama objek untuk styling
+        self.container.setObjectName("container")
         self.container.setFixedSize(self.size())
         self.container.setGraphicsEffect(shadow_effect)
 
@@ -48,6 +62,11 @@ class UpdateWidget(QWidget):
         top_row_layout.addSpacing(15)
         top_row_layout.addWidget(self.status_label, 1)
 
+        self.log_label = QLabel("")
+        self.log_label.setObjectName("logLabel")
+        self.log_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.log_label.hide()
+
         self.progress_bar = QProgressBar()
         self.progress_bar.setTextVisible(True)
         self.progress_bar.setFixedHeight(12)
@@ -58,6 +77,7 @@ class UpdateWidget(QWidget):
         self.action_button.clicked.connect(self.handle_action_click)
 
         main_layout.addLayout(top_row_layout)
+        main_layout.addWidget(self.log_label)
         main_layout.addStretch()
         main_layout.addWidget(self.progress_bar)
         main_layout.addWidget(self.action_button, alignment=Qt.AlignmentFlag.AlignRight)
@@ -75,19 +95,34 @@ class UpdateWidget(QWidget):
             self.move(event.globalPosition().toPoint() - self.drag_pos)
             event.accept()
 
+    def set_log_message(self, message: str):
+        """Mengatur teks pada label log."""
+        self.log_label.setText(message)
+        self.log_label.show()
+
     def set_state(self, state: UpdateState):
         """Mengatur tampilan widget berdasarkan status yang diberikan."""
         self.current_state = state
         self.progress_bar.hide()
+        self.log_label.hide()
         self.action_button.setEnabled(True)
-
+        
         if state == UpdateState.CHECKING:
             self.container.setStyleSheet(self._get_style("#1E1E1E", "#2D2D2D"))
             self.icon_label.setText("⏳")
             self.status_label.setText("Memeriksa pembaruan...")
             self.action_button.setText("Batal")
-            QTimer.singleShot(2000, lambda: self.set_state(UpdateState.NO_UPDATE))
+            self.worker_thread = QThread()
+            self.worker = RequestUpdatesWorker()
+            self.worker.moveToThread(self.worker_thread)
+            self.worker_thread.started.connect(self.worker.run)
+            self.worker.finished.connect(lambda x: self.set_state(UpdateState.UPDATE_AVAILABLE if x else UpdateState.NO_UPDATE))
+            self.worker.finished.connect(self.worker_thread.quit)
+            self.worker.finished.connect(self.worker.deleteLater)
+            self.worker_thread.finished.connect(self.worker_thread.deleteLater)
+            self.worker_thread.start()
 
+            
         elif state == UpdateState.UPDATE_AVAILABLE:
             self.container.setStyleSheet(self._get_style("#283593", "#512DA8"))
             self.icon_label.setText("⬆️")
@@ -104,6 +139,7 @@ class UpdateWidget(QWidget):
             self.container.setStyleSheet(self._get_style("#1E1E1E", "#2D2D2D"))
             self.icon_label.setText("💾")
             self.status_label.setText("Mengunduh pembaruan...")
+            self.set_log_message("Memulai koneksi...")
             self.action_button.setEnabled(False)
             self.action_button.setText("Mengunduh...")
             self.progress_bar.setValue(0)
@@ -111,21 +147,44 @@ class UpdateWidget(QWidget):
 
         elif state == UpdateState.COMPLETED:
             self.container.setStyleSheet(self._get_style("#00695C", "#00897B"))
-            self.icon_label.setText("🎉")
-            self.status_label.setText("Pembaruan berhasil diunduh!")
-            self.action_button.setText("Selesai")
+            self.icon_label.setText("📦")
+            self.status_label.setText("Unduhan selesai, siap diinstall.")
+            self.action_button.setText("Install Sekarang")
             self.progress_bar.setValue(100)
             self.progress_bar.show()
+
+        elif state == UpdateState.INSTALLING: # <-- BARU
+            self.container.setStyleSheet(self._get_style("#4527A0", "#5E35B1"))
+            self.icon_label.setText("⚙️")
+            self.status_label.setText("Menginstall pembaruan...")
+            self.action_button.setEnabled(False)
+            self.action_button.setText("Harap Tunggu...")
+            self.progress_bar.hide()
+            self.run_install_simulation() # Memulai simulasi instalasi
+
+        elif state == UpdateState.ALL_DONE: # <-- BARU
+            self.container.setStyleSheet(self._get_style("#1B5E20", "#2E7D32"))
+            self.icon_label.setText("🎉")
+            self.status_label.setText("Aplikasi berhasil diperbarui!")
+            self.action_button.setText("Selesai")
+
+    def run_install_simulation(self): # <-- BARU: Simulasi instalasi
+        """Simulasi proses instalasi dengan log real-time."""
+        QTimer.singleShot(1000, lambda: self.set_log_message("Mengekstrak file..."))
+        QTimer.singleShot(2500, lambda: self.set_log_message("Menyalin file baru ke direktori..."))
+        QTimer.singleShot(4000, lambda: self.set_log_message("Membersihkan file sementara..."))
+        QTimer.singleShot(5000, lambda: self.set_state(UpdateState.ALL_DONE))
 
     def handle_action_click(self):
         """Menangani klik tombol berdasarkan status saat ini."""
         if self.current_state == UpdateState.UPDATE_AVAILABLE:
             self.start_download()
-        elif self.current_state in [UpdateState.NO_UPDATE, UpdateState.COMPLETED, UpdateState.CHECKING]:
+        elif self.current_state == UpdateState.COMPLETED: # <-- Diubah
+            self.set_state(UpdateState.INSTALLING)
+        elif self.current_state in [UpdateState.NO_UPDATE, UpdateState.ALL_DONE, UpdateState.CHECKING]: # <-- Diubah
             self.close()
 
     def start_download(self):
-        """Memulai proses download."""
         self.set_state(UpdateState.DOWNLOADING)
         url = "https://example.com/file.zip"
         output = "./file.zip"
@@ -136,21 +195,18 @@ class UpdateWidget(QWidget):
 
     def update_progress(self, value):
         self.progress_bar.setValue(value)
+        self.set_log_message(f"Menerima data... {value}%")
 
     def download_finished(self):
         self.set_state(UpdateState.COMPLETED)
     
-    # === METODE YANG DIPERBAIKI ===
     def show_with_fade_in(self):
-        """Menampilkan widget dengan animasi fade-in pada opasitas jendela."""
-        # Animasikan windowOpacity secara langsung untuk menghindari konflik painter
         self.animation = QPropertyAnimation(self, b"windowOpacity")
-        self.animation.setDuration(500)
-        self.animation.setStartValue(0.0)
-        self.animation.setEndValue(1.0)
-        self.animation.start()
-        
+        self.animation.setDuration(100); self.animation.setStartValue(0.0)
+        self.animation.setEndValue(1.0); self.animation.start()
         self.show()
+
+    # Ganti metode _get_style di kelas UpdateWidget Anda dengan ini
 
     def _get_style(self, color1, color2):
         """Helper untuk menghasilkan stylesheet."""
@@ -169,11 +225,23 @@ class UpdateWidget(QWidget):
                 font-weight: bold; border-radius: 10px; padding: 8px 16px;
                 border: 1px solid rgba(255, 255, 255, 0.2);
             }}
-            QPushButton:hover {{ background-color: rgba(255, 255, 255, 0.2); }}
-            QPushButton:disabled {{ background-color: rgba(255, 255, 255, 0.05); color: #AAAAAA; }}
+            QPushButton:hover {{
+                background-color: rgba(255, 255, 255, 0.2);
+            }}
+            QPushButton:disabled {{
+                background-color: rgba(255, 255, 255, 0.05); color: #AAAAAA;
+            }}
             QProgressBar {{
                 border: none; border-radius: 6px; background-color: rgba(0, 0, 0, 0.3);
                 text-align: center; color: white;
             }}
-            QProgressBar::chunk {{ background-color: #4CAF50; border-radius: 6px; }}
+            QProgressBar::chunk {{
+                background-color: #4CAF50; border-radius: 6px;
+            }}
+            #logLabel {{
+                color: #CCCCCC;
+                font-size: 12px;
+                font-weight: normal;
+                background-color: transparent;
+            }}
         """
