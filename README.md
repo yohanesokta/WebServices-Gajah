@@ -39,12 +39,12 @@ Bagi developer yang bekerja di Windows, mengelola beberapa layanan web secara te
 
 | Fitur | Deskripsi |
 | :--- | :--- |
-| quản lý **Kontrol Layanan** | Start/stop Nginx, PHP-CGI, MariaDB, PostgreSQL, dan Redis dengan satu klik. Aplikasi akan otomatis mendeteksi status proses dan port yang digunakan. |
-| 🔄 **PHP Version Switcher** | Ganti versi PHP secara dinamis. Unduh versi PHP (stabil atau arsip) langsung dari API, dan aplikasi akan menangani proses setup path secara otomatis. |
-| ⚙️ **Konfigurasi Cepat** | Ubah port default untuk setiap layanan dan buka file konfigurasi penting (`php.ini`, `nginx.conf`, `my.ini`) langsung dari menu Settings. |
-| 🖥️ **Terminal Terintegrasi** | Pantau log dari semua layanan secara realtime dalam satu tampilan terminal terpadu di dalam aplikasi. Tidak perlu membuka banyak window `cmd`. |
-| 🔗 **XAMPP-sameless Mode** | Fitur unik untuk beralih direktori `htdocs` antara environment Gajah Webserver (`C:\gajahweb\htdocs`) dan instalasi XAMPP yang sudah ada (`C:\xampp\htdocs`). |
-| 🛠️ **Akses Cepat CLI** | Disediakan shortcut untuk membuka *command line interface* (CLI) seperti `psql` dan `redis-cli` dengan konteks environment yang sudah sesuai. |
+|**Kontrol Layanan** | Start/stop Nginx, PHP-CGI, MariaDB, PostgreSQL, dan Redis dengan satu klik. Aplikasi akan otomatis mendeteksi status proses dan port yang digunakan. |
+| **PHP Version Switcher** | Ganti versi PHP secara dinamis. Unduh versi PHP (stabil atau arsip) langsung dari API, dan aplikasi akan menangani proses setup path secara otomatis. |
+|**Konfigurasi Cepat** | Ubah port default untuk setiap layanan dan buka file konfigurasi penting (`php.ini`, `nginx.conf`, `my.ini`) langsung dari menu Settings. |
+| **Terminal Terintegrasi** | Pantau log dari semua layanan secara realtime dalam satu tampilan terminal terpadu di dalam aplikasi. Tidak perlu membuka banyak window `cmd`. |
+| **XAMPP-sameless Mode** | Fitur unik untuk beralih direktori `htdocs` antara environment Gajah Webserver (`C:\gajahweb\htdocs`) dan instalasi XAMPP yang sudah ada (`C:\xampp\htdocs`). |
+|**Akses Cepat CLI** | Disediakan shortcut untuk membuka *command line interface* (CLI) seperti `psql` dan `redis-cli` dengan konteks environment yang sudah sesuai. |
 
 ### 📦 Instalasi & Setup
 
