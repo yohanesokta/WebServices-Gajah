@@ -50,5 +50,3 @@ app.*.map.json
 .venv
 main.spec
 dist
-resource/linux/*
-!resource/linux/.gitkeep
