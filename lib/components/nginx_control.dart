@@ -15,7 +15,7 @@ class Nginxcontrol extends StatefulWidget {
   State<Nginxcontrol> createState() => _NginxcontrolState();
 }
 
-class _NginxcontrolState extends State<Nginxcontrol> {
+class _NginxcontrolState extends State<Nginxcontrol> with WidgetsBindingObserver {
   bool status = false;
   bool _isManualChanging = false;
   Timer? _statusTimer;
@@ -74,6 +74,7 @@ class _NginxcontrolState extends State<Nginxcontrol> {
     }
     Future.delayed(const Duration(seconds: 2), () {
       _isManualChanging = false;
+      _checkNginxStatus();
     });
   }
 
@@ -87,16 +88,21 @@ class _NginxcontrolState extends State<Nginxcontrol> {
   @override
   void initState() {
     super.initState();
-    _checkNginxStatus();
-    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      _checkNginxStatus();
-    });
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     _statusTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+    @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkNginxStatus();
+    }
   }
 
   @override
