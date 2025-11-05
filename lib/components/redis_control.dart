@@ -13,7 +13,7 @@ class Rediscontrol extends StatefulWidget {
   State<Rediscontrol> createState() => _RediscontrolState();
 }
 
-class _RediscontrolState extends State<Rediscontrol> {
+class _RediscontrolState extends State<Rediscontrol> with WidgetsBindingObserver {
   bool status = false;
   bool _isManualChanging = false;
   Timer? _statusTimer;
@@ -64,6 +64,7 @@ class _RediscontrolState extends State<Rediscontrol> {
     }
     Future.delayed(const Duration(seconds: 2), () {
       _isManualChanging = false;
+      _checkRedisStatus();
     });
   }
 
@@ -80,15 +81,20 @@ class _RediscontrolState extends State<Rediscontrol> {
   @override
   void initState() {
     super.initState();
-    _checkRedisStatus();
-    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
       _checkRedisStatus();
-    });
+    }
   }
 
   @override
   void dispose() {
     _statusTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

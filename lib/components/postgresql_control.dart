@@ -13,7 +13,7 @@ class Postgresqlcontrol extends StatefulWidget {
   State<Postgresqlcontrol> createState() => _PostgresqlcontrolState();
 }
 
-class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
+class _PostgresqlcontrolState extends State<Postgresqlcontrol> with WidgetsBindingObserver {
   bool status = false;
   bool _isManualChanging = false;
   Timer? _statusTimer;
@@ -59,6 +59,7 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
     }
     Future.delayed(const Duration(seconds: 2), () {
       _isManualChanging = false;
+      _checkPostgresStatus();
     });
   }
 
@@ -75,15 +76,20 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> {
   @override
   void initState() {
     super.initState();
-    _checkPostgresStatus();
-    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
       _checkPostgresStatus();
-    });
+    }
   }
 
   @override
   void dispose() {
     _statusTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
