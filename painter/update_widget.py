@@ -13,7 +13,7 @@ from PyQt6.QtCore import Qt, QPropertyAnimation, QTimer, QPoint, QObject, QThrea
 from PyQt6.QtGui import QMouseEvent
 from enum import Enum
 from painter.update_request import RequestUpdatesWorker
-from painter.runner import executor
+from painter.runner.executor import Exec
 
 
 class Downloader(QObject):
@@ -228,7 +228,6 @@ class UpdateWidget(QWidget):
             self.action_button.setText("Harap Tunggu...")
             self.progress_bar.hide()
             self.close_button.hide()
-            executor.exec()
             self.run_install_simulation()  # Memulai simulasi instalasi
 
         elif state == UpdateState.ALL_DONE:  # <-- BARU
@@ -240,11 +239,12 @@ class UpdateWidget(QWidget):
 
     def run_install_simulation(self):  # <-- BARU: Simulasi instalasi
         """Simulasi proses instalasi dengan log real-time."""
-        QTimer.singleShot(
-            4000, lambda: self.set_log_message("Membersihkan file sementara...")
-        )
-        
-        QTimer.singleShot(1000, lambda: self.set_state(UpdateState.ALL_DONE))
+        self.prosses = Exec()
+        self.prosses.status.connect(lambda x: self.set_log_message(x))
+        self.prosses.finished.connect(lambda: self.set_state(UpdateState.ALL_DONE))
+        self.prosses.start()
+
+ 
 
     def handle_action_click(self):
         """Menangani klik tombol berdasarkan status saat ini."""
@@ -272,6 +272,7 @@ class UpdateWidget(QWidget):
         self.downloader.finished.connect(self.download_finished)
         self.downloader.error.connect(self.__fail_download)
         self.downloader.start()
+
 
     def update_progress(self, value):
         self.progress_bar.setValue(value)
