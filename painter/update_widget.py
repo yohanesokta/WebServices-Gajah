@@ -7,37 +7,60 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QGraphicsDropShadowEffect,
 )
-from PyQt6.QtCore import Qt, QPropertyAnimation, QTimer, QPoint, QObject, QThread
-from PyQt6.QtGui import QColor, QMouseEvent
+import requests
+
+from PyQt6.QtCore import Qt, QPropertyAnimation, QTimer, QPoint, QObject, QThread,pyqtSignal
+from PyQt6.QtGui import QMouseEvent
 from enum import Enum
 from painter.update_request import RequestUpdatesWorker
-
-from painter.runner.download import Downloader
+from painter.runner import executor
 
 
 class Downloader(QObject):
-    from PyQt6.QtCore import pyqtSignal
-
     progress = pyqtSignal(int)
     finished = pyqtSignal()
+    error = pyqtSignal(str)
 
     def __init__(self, url, output):
         super().__init__()
-        self._progress = 0
-        self._timer = QTimer(self)
-        self._timer.timeout.connect(self._update)
+        self.url = url
+        self.output = output
+        self._is_downloading = False
 
     def start(self):
-        self._progress = 0
-        self._timer.start(50)
+        print("starting")
+        self._is_downloading = True
+        self.thread = QThread()
+        self.moveToThread(self.thread)
+        self.thread.started.connect(self._download)
+        self.thread.start()
 
-    def _update(self):
-        if self._progress < 100:
-            self._progress += 1
-            self.progress.emit(self._progress)
-        else:
-            self._timer.stop()
+    def _download(self):
+        try:
+            response = requests.get(self.url, stream=True, timeout=10)
+            total = int(response.headers.get('content-length', 0))
+            downloaded = 0
+
+            with open(self.output, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if not self._is_downloading:
+                        break
+                    if chunk:
+                        f.write(chunk)
+                        downloaded += len(chunk)
+                        if total > 0:
+                            percent = int(downloaded * 100 / total)
+                            self.progress.emit(percent)
+
             self.finished.emit()
+        except Exception as e:
+            self.error.emit(str(e))
+        finally:
+            self.thread.quit()
+            self.thread.wait()
+
+    def stop(self):
+        self._is_downloading = False
 
 
 class UpdateState(Enum):
@@ -177,13 +200,12 @@ class UpdateWidget(QWidget):
             self.container.setStyleSheet(self._get_style("#1B5E20", "#2E7D32"))
             self.icon_label.setText("✅")
             self.status_label.setText("Aplikasi sudah versi terbaru.")
-            self.action_button.setText("Tutup")
+            self.action_button.hide()
 
         elif state == UpdateState.DOWNLOADING:
             self.container.setStyleSheet(self._get_style("#263238", "#455A64"))
             self.icon_label.setText("💾")
             self.status_label.setText("Mengunduh pembaruan...")
-            self.set_log_message("Memulai koneksi...")
             self.action_button.setEnabled(False)
             self.action_button.setText("Mengunduh...")
             self.progress_bar.setValue(0)
@@ -206,6 +228,7 @@ class UpdateWidget(QWidget):
             self.action_button.setText("Harap Tunggu...")
             self.progress_bar.hide()
             self.close_button.hide()
+            executor.exec()
             self.run_install_simulation()  # Memulai simulasi instalasi
 
         elif state == UpdateState.ALL_DONE:  # <-- BARU
@@ -217,14 +240,11 @@ class UpdateWidget(QWidget):
 
     def run_install_simulation(self):  # <-- BARU: Simulasi instalasi
         """Simulasi proses instalasi dengan log real-time."""
-        QTimer.singleShot(1000, lambda: self.set_log_message("Mengekstrak file..."))
-        QTimer.singleShot(
-            2500, lambda: self.set_log_message("Menyalin file baru ke direktori...")
-        )
         QTimer.singleShot(
             4000, lambda: self.set_log_message("Membersihkan file sementara...")
         )
-        QTimer.singleShot(5000, lambda: self.set_state(UpdateState.ALL_DONE))
+        
+        QTimer.singleShot(1000, lambda: self.set_state(UpdateState.ALL_DONE))
 
     def handle_action_click(self):
         """Menangani klik tombol berdasarkan status saat ini."""
@@ -239,13 +259,18 @@ class UpdateWidget(QWidget):
         ]:
             self.close()
 
+    def __fail_download(self,error):
+        self.set_log_message(f"❌ Gagal : {error}")
+        self.close_button.show()
+
     def start_download(self):
         self.set_state(UpdateState.DOWNLOADING)
-        url = "https://example.com/file.zip"
-        output = "./file.zip"
-        self.downloader = Downloader(url, output)
+        url = "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/phpMyAdmin-5.2.2-all-languages.zip"  # contoh file besar untuk test
+        output = "./update_file.bin"
+        self.downloader =  Downloader(url, output)
         self.downloader.progress.connect(self.update_progress)
         self.downloader.finished.connect(self.download_finished)
+        self.downloader.error.connect(self.__fail_download)
         self.downloader.start()
 
     def update_progress(self, value):
