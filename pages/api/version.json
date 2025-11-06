@@ -1,5 +1,11 @@
 [
   {
+    "version" : 2.1,
+    "available-patch" : 1,
+    "update-patch" : "https://github.com/yohanesokta/WebServices-Gajah/releases/download/v2.1/update_2_1.zip",
+    "important" : 1
+  },
+  {
     "version": 2.0,
     "available-patch": 0,
     "update-patch": "-",

@@ -17,7 +17,7 @@ class Mariadbcontrol extends StatefulWidget {
   State<Mariadbcontrol> createState() => _MariadbcontrolState();
 }
 
-class _MariadbcontrolState extends State<Mariadbcontrol> {
+class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObserver {
   bool status = false;
   bool _isManualChanging = false;
   Timer? _statusTimer;
@@ -57,15 +57,17 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
     }
 
     Future.delayed(const Duration(seconds: 2), () {
+      _checkMariadbStatus();
       _isManualChanging = false;
     });
   }
 
   void _checkMariadbStatus() async {
+    print("mariadb check");
     if (_isManualChanging) return;
 
     bool mysqldProcess = await checkProcess('mysqld.exe');
-    if (!mounted) return; // Early exit if not mounted
+    if (!mounted) return;
 
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String mariadbPort = preferences.getString("mariadbPort") ?? "3306";
@@ -81,19 +83,7 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
           "Peringatan: Port $mariadbPort sedang digunakan oleh aplikasi lain. Harap matikan aplikasi tersebut.",
         );
       }
-    } else if (!isPortInUse && mysqldProcess) {
-      if (!_dialogShown) {
-        setState(() {
-          _dialogShown = true;
-        });
-        await showConfirmDialog(
-          context,
-          "Peringatan: Proses mysqld.exe berjalan tetapi tidak menggunakan port $mariadbPort. Proses akan dihentikan.",
-        );
-        await killProcess("mysqld.exe");
-        mysqldProcess = false; // Update status after killing
-      }
-    } else if (!mysqldProcess) {
+    }  else if (!mysqldProcess) {
       if (_dialogShown) {
         if (mounted) {
           setState(() {
@@ -122,16 +112,22 @@ class _MariadbcontrolState extends State<Mariadbcontrol> {
   @override
   void initState() {
     super.initState();
-    _checkMariadbStatus();
-    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      _checkMariadbStatus();
-    });
+    WidgetsBinding.instance.addObserver(this);
   }
+
 
   @override
   void dispose() {
     _statusTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+     _checkMariadbStatus(); 
+    }
   }
 
   @override
