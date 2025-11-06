@@ -10,7 +10,7 @@ import 'package:gajahweb/components/mariadb_control.dart';
 import 'package:gajahweb/components/nginx_control.dart';
 import 'package:gajahweb/components/redis_control.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'dart:io';
 
 class HomeApp extends StatefulWidget {
   const HomeApp({super.key});
@@ -57,16 +57,12 @@ class _HomeAppState extends State<HomeApp> {
             message: "Check for Updates",
             child: IconButton(
               onPressed: () async {
-                    final modal = await showConfirmDialog(
-                      context,
-                      "OTA updates are not available yet. Please check the GitHub releases page for updates.",
+                      await Process.start('C:\\gajahweb\\ota-update.exe',
+                      [],
+                      runInShell: false,
+                      mode: ProcessStartMode.detached,
+                      workingDirectory: "C:\\gajahweb\\",
                     );
-
-                    if (modal) {
-                      print("Launching GitHub releases page...");
-                      final urlLauncher = Uri.parse("https://github.com/yohanesokta/WebServices-Gajah/releases");
-                      await launchUrl(urlLauncher);
-                    }
                   },
               icon: const Icon(Icons.update),
             ),
@@ -171,7 +167,7 @@ class _HomeAppState extends State<HomeApp> {
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Row(
             children: [
-              const Text("Build v2.0", style: TextStyle(fontSize: 12)),
+              const Text("Build v2.1", style: TextStyle(fontSize: 12)),
               const Spacer(),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, "/about"),

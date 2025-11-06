@@ -15,7 +15,7 @@ class HttpdControl extends StatefulWidget {
   State<HttpdControl> createState() => _HttpdControlState();
 }
 
-class _HttpdControlState extends State<HttpdControl> {
+class _HttpdControlState extends State<HttpdControl> with WidgetsBindingObserver {
   bool status = false;
   bool _isManualChanging = false;
   Timer? _statusTimer;
@@ -29,6 +29,8 @@ class _HttpdControlState extends State<HttpdControl> {
   }
 
   void _checkHttpdStatus() async {
+    print("httpd check");
+
     if (_isManualChanging) return;
     bool httpdIsRun = await checkProcess('httpd.exe');
     if (mounted) {
@@ -66,6 +68,7 @@ class _HttpdControlState extends State<HttpdControl> {
 
     Future.delayed(const Duration(seconds: 2), () {
       _isManualChanging = false;
+      _checkHttpdStatus();
     });
   }
 
@@ -79,15 +82,20 @@ class _HttpdControlState extends State<HttpdControl> {
   @override
   void initState() {
     super.initState();
-    _checkHttpdStatus();
-    _statusTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
       _checkHttpdStatus();
-    });
+    }
   }
 
   @override
   void dispose() {
     _statusTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
