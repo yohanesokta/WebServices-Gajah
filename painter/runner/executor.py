@@ -6,11 +6,15 @@ from PyQt6.QtCore import QObject, pyqtSignal, QThread
 class _ExecWorker(QObject):
     finished = pyqtSignal()
     status = pyqtSignal(str)
+    __url = ""
+
+    def setBatPath(self,bat_path):
+        self.__url = bat_path
 
     def run(self):
         try:
-            bat_path = os.path.join(os.getcwd(), "var", "script.bat")
-
+            bat_path = self.__url
+            print("BATTT PATHHHHH",bat_path)
             if not os.path.exists(bat_path):
                 self.status.emit(f"[ERROR] File tidak ditemukan: {bat_path}")
                 self.finished.emit()
@@ -39,10 +43,11 @@ class Exec(QObject):
     finished = pyqtSignal()
     status = pyqtSignal(str)
 
-    def __init__(self):
+    def __init__(self,bat_path):
         super().__init__()
         self._thread = None
         self._worker = None
+        self.path = bat_path
 
     def start(self):
         self._thread = QThread()
@@ -57,4 +62,5 @@ class Exec(QObject):
 
         self._worker.moveToThread(self._thread)
         self._thread.started.connect(self._worker.run)
+        self._worker.setBatPath(self.path)
         self._thread.start()

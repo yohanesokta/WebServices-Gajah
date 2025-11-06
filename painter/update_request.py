@@ -10,6 +10,7 @@ class RequestUpdatesWorker(QObject):
     config.read("version.ini")
     finished = pyqtSignal(bool)
     localVersion = version.parse(config["VERSION"]["APP"])
+    serverVersion = ""
 
     def run(self):
         try:
@@ -17,6 +18,7 @@ class RequestUpdatesWorker(QObject):
             with urllib.request.urlopen(url, timeout=5) as response:
                 data = json.loads(response.read().decode())
             serverVersion = version.parse(str(data[0]["version"]))
+            self.serverVersion = data
             print(float(self.config["VERSION"]["APP"]), "<", float(data[0]["version"]))
             self.finished.emit(self.localVersion < serverVersion)
         except Exception as e:

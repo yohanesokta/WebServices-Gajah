@@ -5,16 +5,15 @@ from PyQt6.QtWidgets import (
     QProgressBar,
     QLabel,
     QHBoxLayout,
-    QGraphicsDropShadowEffect,
 )
 import requests
 
-from PyQt6.QtCore import Qt, QPropertyAnimation, QTimer, QPoint, QObject, QThread,pyqtSignal
+from PyQt6.QtCore import Qt, QPropertyAnimation, QPoint, QObject, QThread,pyqtSignal
 from PyQt6.QtGui import QMouseEvent
 from enum import Enum
 from painter.update_request import RequestUpdatesWorker
 from painter.runner.executor import Exec
-
+import os
 
 class Downloader(QObject):
     progress = pyqtSignal(int)
@@ -237,17 +236,26 @@ class UpdateWidget(QWidget):
             self.action_button.hide()
             self.close_button.setText("Selesai")
 
-    def run_install_simulation(self):  # <-- BARU: Simulasi instalasi
-        """Simulasi proses instalasi dengan log real-time."""
-        self.prosses = Exec()
+    def run_install_simulation(self): 
+
+        unzip_path = "C:\\gajahweb\\data\\flutter_assets\\resource\\unzip.exe"
+        folder_output = self.FileOutput.split(".")[0]
+
+        def simulate_done():
+            os.system(f"rmdir /s /q {folder_output}")
+            os.system(f"del /f /q {self.FileOutput}")
+            self.set_state(UpdateState.ALL_DONE)
+        
+        os.system(f"{unzip_path} -o {self.FileOutput} -d {folder_output}")
+        self.prosses = Exec(os.path.join(self.FileOutput.split('.')[0],"update.bat"))
         self.prosses.status.connect(lambda x: self.set_log_message(x))
-        self.prosses.finished.connect(lambda: self.set_state(UpdateState.ALL_DONE))
+        self.prosses.finished.connect(simulate_done)
         self.prosses.start()
+        
 
  
 
     def handle_action_click(self):
-        """Menangani klik tombol berdasarkan status saat ini."""
         if self.current_state == UpdateState.UPDATE_AVAILABLE:
             self.start_download()
         elif self.current_state == UpdateState.COMPLETED:  # <-- Diubah
@@ -265,9 +273,10 @@ class UpdateWidget(QWidget):
 
     def start_download(self):
         self.set_state(UpdateState.DOWNLOADING)
-        url = "https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/phpMyAdmin-5.2.2-all-languages.zip"  # contoh file besar untuk test
-        output = "./update_file.bin"
-        self.downloader =  Downloader(url, output)
+        print(self.worker.serverVersion[0]['update-patch'],self.worker.serverVersion[0]['version'])
+        url = self.worker.serverVersion[0]['update-patch']
+        self.FileOutput = os.path.join(os.getcwd(),"var",url.split('/')[-1])
+        self.downloader =  Downloader(url, self.FileOutput)
         self.downloader.progress.connect(self.update_progress)
         self.downloader.finished.connect(self.download_finished)
         self.downloader.error.connect(self.__fail_download)
