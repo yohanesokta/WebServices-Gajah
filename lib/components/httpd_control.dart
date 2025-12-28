@@ -30,12 +30,14 @@ class _HttpdControlState extends State<HttpdControl> with WidgetsBindingObserver
 
   void _checkHttpdStatus() async {
     print("httpd check");
+    String prosessName = (Platform.operatingSystem == "linux") ? "httpd" : "httpd.exe";
 
     if (_isManualChanging) return;
-    bool httpdIsRun = await checkProcess('httpd.exe');
+    bool httpdIsRun = await checkProcess(prosessName);
     if (mounted) {
       setState(() {
         status = httpdIsRun;
+        print("httpd status: $status");
       });
     }
   }

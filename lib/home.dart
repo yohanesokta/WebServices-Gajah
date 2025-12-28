@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gajahweb/components/httpd_control.dart';
 import 'package:gajahweb/components/information.dart';
-import 'package:gajahweb/components/part/notification.dart';
 import 'package:gajahweb/components/postgresql_control.dart';
 import 'package:gajahweb/components/xampp_sameless.dart';
 import 'package:gajahweb/utils/process.dart';
@@ -9,7 +8,6 @@ import 'package:gajahweb/utils/runtime.dart';
 import 'package:gajahweb/components/mariadb_control.dart';
 import 'package:gajahweb/components/nginx_control.dart';
 import 'package:gajahweb/components/redis_control.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 
 class HomeApp extends StatefulWidget {
@@ -21,11 +19,12 @@ class HomeApp extends StatefulWidget {
 
 class _HomeAppState extends State<HomeApp> {
   bool _isTerminalVisible = false;
-
+  String _OSVer = Platform.operatingSystem;
   @override
   void initState() {
     super.initState();
     getConfig();
+    print("Operating System: $_OSVer");
   }
 
   @override
