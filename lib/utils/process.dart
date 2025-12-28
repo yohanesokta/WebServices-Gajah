@@ -1,7 +1,17 @@
 import "dart:io";
 
+
 Future<bool> checkProcess(String nameProcess) async {
+  String os = Platform.operatingSystem;
   try {
+    if (os == "linux") {
+      final result = await Process.run(
+      'pgrep',
+      [nameProcess],
+    );
+    return result.exitCode == 0;
+    }
+
     final result = await Process.run('tasklist', [], runInShell: true);
     final output = result.stdout.toString().toLowerCase();
     final pattern = RegExp(

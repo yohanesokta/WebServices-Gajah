@@ -10,6 +10,7 @@ import 'package:gajahweb/utils/slide_left_route.dart';
 import 'package:gajahweb/utils/terminal_context.dart';
 import 'home.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
