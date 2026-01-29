@@ -396,10 +396,10 @@ packages:
     dependency: "direct dev"
     description:
       name: mockito
-      sha256: "4feb43bc4eb6c03e832f5fcd637d1abb44b98f9cfa245c58e27382f58859f8f6"
+      sha256: a45d1aa065b796922db7b9e7e7e45f921aed17adf3a8318a1f47097e7e695566
       url: "https://pub.dev"
     source: hosted
-    version: "5.5.1"
+    version: "5.6.3"
   multicast_dns:
     dependency: transitive
     description:
