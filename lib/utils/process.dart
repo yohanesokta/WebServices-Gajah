@@ -11,7 +11,6 @@ Future<bool> checkProcess(String nameProcess) async {
     );
     return result.exitCode == 0;
     }
-
     final result = await Process.run('tasklist', [], runInShell: true);
     final output = result.stdout.toString().toLowerCase();
     final pattern = RegExp(

@@ -15,7 +15,8 @@ class HttpdControl extends StatefulWidget {
   State<HttpdControl> createState() => _HttpdControlState();
 }
 
-class _HttpdControlState extends State<HttpdControl> with WidgetsBindingObserver {
+class _HttpdControlState extends State<HttpdControl>
+    with WidgetsBindingObserver {
   bool status = false;
   bool _isManualChanging = false;
   Timer? _statusTimer;
@@ -30,7 +31,9 @@ class _HttpdControlState extends State<HttpdControl> with WidgetsBindingObserver
 
   void _checkHttpdStatus() async {
     print("httpd check");
-    String prosessName = (Platform.operatingSystem == "linux") ? "httpd" : "httpd.exe";
+    String prosessName = (Platform.operatingSystem == "linux")
+        ? "httpd"
+        : "httpd.exe";
 
     if (_isManualChanging) return;
     bool httpdIsRun = await checkProcess(prosessName);
@@ -49,18 +52,27 @@ class _HttpdControlState extends State<HttpdControl> with WidgetsBindingObserver
     const webservicePath = "C:\\gajahweb";
 
     if (status) {
-      await Process.run("taskkill.exe", ["/F", "/IM", "httpd.exe"]);
+      if (Platform.operatingSystem == "linux") {
+        await Process.run("pkexec", ["pkill", "httpd"]);
+      } else {
+        await Process.run("taskkill.exe", ["/F", "/IM", "httpd.exe"]);
+      }
       sendTerminal("Menghentikan Proses [httpd.exe]\nBerhasil!");
     } else {
-      await Process.start(
-        "$webservicePath\\apache\\bin\\httpd.exe",
-        ["-f", "$webservicePath\\apache\\conf\\httpd.conf"],
-        workingDirectory: "$webservicePath\\apache",
-        runInShell: false,
-        mode: ProcessStartMode.detached,
-      );
-
-      sendTerminal("Memulai Httpd :$port\nBerhasil!");
+      if (Platform.operatingSystem == "linux") {
+        await Process.run("pkexec", [
+          "/opt/runtime/start.sh",
+        ], runInShell: true);
+      } else {
+        await Process.start(
+          "$webservicePath\\apache\\bin\\httpd.exe",
+          ["-f", "$webservicePath\\apache\\conf\\httpd.conf"],
+          workingDirectory: "$webservicePath\\apache",
+          runInShell: false,
+          mode: ProcessStartMode.detached,
+        );
+        sendTerminal("Memulai Httpd :$port\nBerhasil!");
+      }
     }
     if (mounted) {
       setState(() {

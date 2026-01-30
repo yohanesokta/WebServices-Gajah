@@ -19,12 +19,11 @@ class HomeApp extends StatefulWidget {
 
 class _HomeAppState extends State<HomeApp> {
   bool _isTerminalVisible = false;
-  String _OSVer = Platform.operatingSystem;
   @override
+
   void initState() {
     super.initState();
     getConfig();
-    print("Operating System: $_OSVer");
   }
 
   @override
