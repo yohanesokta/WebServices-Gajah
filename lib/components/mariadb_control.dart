@@ -130,16 +130,18 @@ class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObse
     }
   }
 
+  final String runtimeName=  Platform.operatingSystem == "linux" ? "MySQL" : "MariaDB";
+  final String assetsImage=  Platform.operatingSystem == "linux" ? "assets/logo-mysql.png" : "assets/mariadb.png";
   @override
   Widget build(BuildContext context) {
     return ServiceControlCard(
-      serviceName: "MariaDB",
+      serviceName: runtimeName,
       statusText: status ? "Running" : "Stopped",
       statusColor: status ? Colors.green : Colors.red,
       value: status,
       onChanged: _triggerMariaDB,
       onLaunch: status ? _launchPhpMyAdmin : null,
-      imageAsset: "assets/mariadb.png",
+      imageAsset: assetsImage,
     );
   }
 }
