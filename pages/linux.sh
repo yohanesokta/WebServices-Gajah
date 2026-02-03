@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 set -e
-
-### ===============================
-### CONFIG
-### ===============================
 RUNTIME_ROOT="/opt"
 RUNTIME_DIR="/opt/runtime"
 TEMP_DIR="$HOME/gajah_temp"
@@ -107,7 +103,7 @@ sudo ln -s \
 
 ok "MySQL runtime installed"
 
-### ===============================
+### ===============================q
 ### MYSQL USER
 ### ===============================
 step "Configuring MySQL system user"
@@ -127,11 +123,12 @@ ok "MySQL user ready"
 ### ===============================
 step "Initializing MySQL data directory"
 
-sudo chown -R mysql:mysql "$RUNTIME_DIR/mysql-9.6.0-linux-glibc2.28-x86_64-minimal"
+# sudo chown -R mysql:mysql "$RUNTIME_DIR/mysql-9.6.0-linux-glibc2.28-x86_64-minimal"
 
-sudo -u mysql "$RUNTIME_DIR/mysql/bin/mysqld" \
+sudo "$RUNTIME_DIR/mysql/bin/mysqld" \
   --initialize-insecure \
-  --basedir="$RUNTIME_DIR/mysql" \
+  --user=mysql \
+  # --basedir="$RUNTIME_DIR/mysql" \
 
 ok "MySQL initialized (root password kosong)"
 
