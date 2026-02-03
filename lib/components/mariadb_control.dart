@@ -23,6 +23,8 @@ class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObse
   Timer? _statusTimer;
   bool _dialogShown = false;
 
+  final String processName = Platform.operatingSystem == "windows" ? "mysqld.exe" : "mysqld";
+
   Future<void> sendTerminal(String message) async {
     final terminalAdd = Provider.of<Terminalcontext>(
       context,
@@ -36,16 +38,36 @@ class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObse
     try {
       const mysqlPath = "C:\\gajahweb\\mariadb";
       if (status) {
-        killProcess('mysqld.exe');
-        sendTerminal("Mematikan proses mysqld.exe\nBerhasil");
+        if (Platform.isWindows) {
+        killProcess(processName);
+        } else {
+          await Process.start(
+            "pkexec",
+            ["sudo","/opt/runtime/mysql/bin/mysqladmin","shutdown"],
+            mode: ProcessStartMode.inheritStdio,
+            workingDirectory: "/opt/runtime/mysql",
+            runInShell: true,
+          );
+        }
+        sendTerminal("Mematikan proses $processName\nBerhasil");
       } else {
+        if (Platform.isWindows) {
         await Process.start(
           "$mysqlPath\\bin\\mysqld.exe",
           ["--datadir=$mysqlPath\\data", "--console"],
           mode: ProcessStartMode.detached,
           runInShell: false,
         );
-        sendTerminal("memulai proses mysqld.exe\nBerhasil");
+        } else {
+          await Process.start(
+            "pkexec",
+            ["sudo","-u","mysql","/opt/runtime/mysql/bin/mysqld"],
+            mode: ProcessStartMode.inheritStdio,
+            workingDirectory: "/opt/runtime/mysql",
+            runInShell: true,
+          );
+        }
+        sendTerminal("memulai proses ${processName}\nBerhasil");
       }
     } catch (error) {
       // print(e);
@@ -65,10 +87,9 @@ class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObse
   void _checkMariadbStatus() async {
     print("mariadb check");
     if (_isManualChanging) return;
-
-    bool mysqldProcess = await checkProcess('mysqld.exe');
+    
+    bool mysqldProcess =  await checkProcess(processName);
     if (!mounted) return;
-
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String mariadbPort = preferences.getString("mariadbPort") ?? "3306";
     bool isPortInUse = !await isPortAvailable(mariadbPort);
@@ -83,7 +104,8 @@ class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObse
           "Peringatan: Port $mariadbPort sedang digunakan oleh aplikasi lain. Harap matikan aplikasi tersebut.",
         );
       }
-    }  else if (!mysqldProcess) {
+    } 
+     else if (!mysqldProcess) {
       if (_dialogShown) {
         if (mounted) {
           setState(() {
@@ -92,7 +114,6 @@ class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObse
         }
       }
     }
-
     if (mounted) {
       setState(() {
         status = mysqldProcess;
@@ -144,4 +165,5 @@ class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObse
       imageAsset: assetsImage,
     );
   }
+
 }
