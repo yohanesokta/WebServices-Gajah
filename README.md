@@ -2,15 +2,16 @@
 
 # Gajah Webserver
 
-**Manajemen Web Stack Lokal untuk Windows Menjadi Mudah.**
+**Manajemen Web Stack Lokal untuk Windows dan Linux Menjadi Mudah.**
 
-<p>Sebuah panel kontrol desktop modern berbasis Flutter untuk mengelola Nginx, PHP, MariaDB, PostgreSQL, dan Redis di lingkungan Windows.</p>
+<p>Sebuah panel kontrol desktop modern berbasis Flutter untuk mengelola Nginx, PHP, MariaDB, PostgreSQL, dan Redis di lingkungan Windows dan Linux.</p>
 
 
 [![CI – Flutter Tests](https://github.com/yohanesokta/WebServices-Gajah/actions/workflows/flutter-tests.yml/badge.svg)](https://github.com/yohanesokta/WebServices-Gajah/actions/workflows/flutter-tests.yml)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
+[![Platform: Linux](https://img.shields.io/badge/Platform-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://www.linux.org/)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?style=for-the-badge&logo=conventionalcommits)](https://conventionalcommits.org)
 
 </div>
@@ -19,11 +20,11 @@
 
 ### 🤔 Mengapa Gajah Webserver?
 
-Bagi developer yang bekerja di Windows, mengelola beberapa layanan web secara terpisah seringkali merepotkan. Proses start/stop service, mengganti versi PHP, atau sekadar melihat log membutuhkan banyak intervensi manual melalui command line atau skrip yang tersebar.
+Bagi developer yang bekerja di Windows atau Linux, mengelola beberapa layanan web secara terpisah seringkali merepotkan. Proses start/stop service, mengganti versi PHP, atau sekadar melihat log membutuhkan banyak intervensi manual melalui command line atau skrip yang tersebar.
 
 **Gajah Webserver** lahir untuk menyelesaikan masalah ini dengan menyediakan satu antarmuka grafis (GUI) yang intuitif dan terpusat, memungkinkan developer untuk fokus pada coding, bukan pada administrasi environment lokal.
 
-### ✨ Demo Aplikasi
+### Demo Aplikasi
 
 <div align="center">
 
@@ -51,9 +52,10 @@ Bagi developer yang bekerja di Windows, mengelola beberapa layanan web secara te
 #### 1. Prasyarat
 
 Pastikan perangkat Anda telah terinstall:
-- **Windows 10/11 (x64)**
-- **[Flutter SDK](https://flutter.dev/docs/get-started/install/windows)** (versi stabil)
-- **[Visual Studio](https://visualstudio.microsoft.com/downloads/)** dengan komponen "Desktop development with C++"
+- **Windows 10/11 (x64)** atau **Distro Linux modern (x64)**
+- **[Flutter SDK](https://flutter.dev/docs/get-started/)** (versi stabil)
+- **Untuk Windows:** **[Visual Studio](https://visualstudio.microsoft.com/downloads/)** dengan komponen "Desktop development with C++"
+- **Untuk Linux:** Pastikan dependensi build yang diperlukan untuk Flutter di Linux sudah terinstal.
 
 #### 2. Proses Instalasi
 
@@ -68,15 +70,31 @@ Pastikan perangkat Anda telah terinstall:
     flutter pub get
     ```
 
-3.  **Jalankan Setup Script:**
-    Klik ganda file `setup.bat`. Skrip ini akan mengunduh binary yang diperlukan dan membuat struktur direktori di `C:\gajahweb`.
+3.  **Setup Environment:**
 
-    > **Penting:** Pastikan skrip `setup.bat` berjalan hingga selesai tanpa error.
+    *   **Untuk Windows:**
+        Klik ganda file `setup.bat`. Skrip ini akan mengunduh binary yang diperlukan dan membuat struktur direktori di `C:\gajahweb`.
+
+        > **Penting:** Pastikan skrip `setup.bat` berjalan hingga selesai tanpa error.
+
+    *   **Untuk Linux:**
+        Jalankan skrip `linux.sh` dari direktori `pages`. Skrip ini akan mengunduh binary yang diperlukan dan membuat struktur direktori di `/opt/gajahweb`.
+
+        ```bash
+        sudo bash pages/linux.sh
+        ```
+        > **Penting:** Pastikan skrip `linux.sh` berjalan hingga selesai tanpa error.
 
 4.  **Jalankan Aplikasi:**
-    ```bash
-    flutter run -d windows
-    ```
+
+    *   **Untuk Windows:**
+        ```bash
+        flutter run -d windows
+        ```
+    *   **Untuk Linux:**
+        ```bash
+        flutter run -d linux
+        ```
 
 ### 🗺️ Roadmap Pengembangan
 
@@ -85,7 +103,6 @@ Berikut adalah beberapa rencana fitur untuk Gajah Webserver di masa depan:
 - [ ] **UI/UX Refresh:** Pembaruan antarmuka agar lebih modern dan intuitif.
 - [ ] **Konfigurasi vhost:** Fitur untuk mengelola virtual host Nginx/Apache dari GUI.
 - [ ] **Plugin System:** Arsitektur plugin untuk menambahkan dukungan layanan lain.
-- [ ] **Dukungan Multi-platform:** Porting aplikasi untuk berjalan di macOS dan Linux.
 
 ### 🧪 Menjalankan Test
 

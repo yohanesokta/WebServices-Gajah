@@ -124,6 +124,9 @@ ok "Apache + PHP downloaded"
 step "Extracting Apache + PHP runtime"
 extract "$APACHE_ARCHIVE" "$RUNTIME_ROOT"
 ok "Apache + PHP installed"
+sudo mkdir -p "$RUNTIME_DIR/php/session"
+sudo chmod 733 "$RUNTIME_DIR/php/session"
+ok "PHP session directory ready"
 
 ### ===============================
 ### PHPMYADMIN
