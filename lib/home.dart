@@ -30,8 +30,8 @@ class _HomeAppState extends State<HomeApp> {
   Widget build(BuildContext context) {
     final serviceWidgets = [
       const HttpdControl(),
-      const Nginxcontrol(),
       const Mariadbcontrol(),
+      const Nginxcontrol(),
       const Postgresqlcontrol(),
       const Rediscontrol(),
     ];
@@ -74,7 +74,6 @@ class _HomeAppState extends State<HomeApp> {
             ),
           ),
           const SizedBox(width: 10),
-
         ],
       ),
       body: SingleChildScrollView(
