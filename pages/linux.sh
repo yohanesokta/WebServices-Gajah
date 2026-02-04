@@ -6,9 +6,12 @@ TEMP_DIR="$HOME/gajah_temp"
 
 APACHE_URL="https://github.com/yohanesokta/PHP-Apache_Binaries_Static/releases/download/build-20251229-7/apache-php-linux_x86-64.tar.gz"
 MYSQL_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/mysql-9.6.0-linux-glibc2.28-x86_64-minimal.tar.xz"
+PHPMYADMIN_URL="https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.zip"
+PHPMYADMIN_CONFIG_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/config.inc.php"
 
 APACHE_ARCHIVE="$TEMP_DIR/apache-php-linux_x86-64.tar.gz"
 MYSQL_ARCHIVE="$TEMP_DIR/mysql-9.6.0-linux-glibc2.28-x86_64-minimal.tar.xz"
+PHPMYADMIN_ARCHIVE="$TEMP_DIR/phpmyadmin-5.2.3.zip"
 
 ### ===============================
 ### UI HELPERS
@@ -63,14 +66,15 @@ extract() {
 ### START
 ### ===============================
 clear
-bold "🐘 Gajah Runtime Installer"
+
+bold "Gajah Runtime Installer"
 echo "────────────────────────────────────────"
 echo "Apache + PHP + MySQL Runtime"
-echo
 
 ### ===============================
 ### PREPARE
 ### ===============================
+
 step "Preparing directories"
 mkdir -p "$TEMP_DIR"
 sudo mkdir -p "$RUNTIME_DIR"
@@ -80,18 +84,33 @@ ok "Directories ready"
 ### DOWNLOAD APACHE
 ### ===============================
 step "Downloading Apache + PHP runtime"
-# download "$APACHE_URL" "$APACHE_ARCHIVE"
+download "$APACHE_URL" "$APACHE_ARCHIVE"
 ok "Apache + PHP downloaded"
 
 step "Extracting Apache + PHP runtime"
 extract "$APACHE_ARCHIVE" "$RUNTIME_ROOT"
 ok "Apache + PHP installed"
 
+step "Downloading phpMyAdmin"
+download "$PHPMYADMIN_URL" "$PHPMYADMIN_ARCHIVE"
+ok "phpMyAdmin downloaded"
+
+step "Extracting phpMyAdmin"
+sudo unzip -q "$PHPMYADMIN_ARCHIVE" -d "$RUNTIME_ROOT/runtime/www"
+sudo mv "$RUNTIME_ROOT/runtime/www/phpMyAdmin-5.2.3-all-languages" "$RUNTIME_ROOT/runtime/www/phpmyadmin"
+ok "phpMyAdmin installed"
+
+step "Downloading phpMyAdmin configuration"
+download "$PHPMYADMIN_CONFIG_URL" "$TEMP_DIR/config.inc.php"
+sudo cp "$TEMP_DIR/config.inc.php" "$RUNTIME_ROOT/runtime/www/phpmyadmin/config.inc.php"
+ok "phpMyAdmin configuration ready"
+
+
 ### ===============================
 ### DOWNLOAD MYSQL
 ### ===============================
 step "Downloading MySQL runtime"
-# download "$MYSQL_URL" "$MYSQL_ARCHIVE"
+download "$MYSQL_URL" "$MYSQL_ARCHIVE"
 ok "MySQL downloaded"
 
 step "Extracting MySQL runtime"
@@ -128,13 +147,21 @@ step "Initializing MySQL data directory"
 sudo "$RUNTIME_DIR/mysql/bin/mysqld" \
   --initialize-insecure \
   --user=mysql \
-  # --basedir="$RUNTIME_DIR/mysql" \
 
 ok "MySQL initialized (root password kosong)"
 
 ### ===============================
 ### DONE
 ### ===============================
+
+
+
+if [ -d "$TEMP_DIR" ]; then
+  step "Cleaning up temporary files"
+  rm -rf "$TEMP_DIR"
+  ok "Temporary files removed"
+fi
+
 echo
 green "🎉 Installation completed successfully!"
 echo

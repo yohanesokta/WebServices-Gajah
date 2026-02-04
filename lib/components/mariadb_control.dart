@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:gajahweb/components/service_control_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,7 +11,6 @@ import 'package:gajahweb/components/part/notification.dart';
 
 class Mariadbcontrol extends StatefulWidget {
   const Mariadbcontrol({super.key});
-
   @override
   State<Mariadbcontrol> createState() => _MariadbcontrolState();
 }
