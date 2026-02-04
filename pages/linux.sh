@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -e
+
+### ===============================
+### PATH & URL
+### ===============================
 RUNTIME_ROOT="/opt"
 RUNTIME_DIR="/opt/runtime"
 TEMP_DIR="$HOME/gajah_temp"
@@ -21,27 +25,15 @@ green()  { echo -e "\033[32m$1\033[0m"; }
 yellow() { echo -e "\033[33m$1\033[0m"; }
 red()    { echo -e "\033[31m$1\033[0m"; }
 
-step() {
-  echo
-  bold "▶ $1"
-}
-
-ok() {
-  green "✔ $1"
-}
-
-die() {
-  red "✖ $1"
-  exit 1
-}
+step() { echo; bold "▶ $1"; }
+ok()   { green "✔ $1"; }
+die()  { red "✖ $1"; exit 1; }
 
 ### ===============================
 ### UTIL
 ### ===============================
 download() {
-  local url="$1"
-  local out="$2"
-
+  local url="$1" out="$2"
   if command -v wget >/dev/null 2>&1; then
     wget -q --show-progress -O "$out" "$url"
   elif command -v curl >/dev/null 2>&1; then
@@ -52,9 +44,7 @@ download() {
 }
 
 extract() {
-  local archive="$1"
-  local dest="$2"
-
+  local archive="$1" dest="$2"
   if command -v pv >/dev/null 2>&1; then
     pv "$archive" | sudo tar -xf - -C "$dest"
   else
@@ -63,25 +53,69 @@ extract() {
 }
 
 ### ===============================
+### DETECT OS (NGINX)
+### ===============================
+detect_os() {
+  [ -f /etc/os-release ] || die "OS tidak dikenali"
+  . /etc/os-release
+  OS_ID="$ID"
+  OS_LIKE="$ID_LIKE"
+}
+
+install_nginx_debian() {
+  sudo apt update -y
+  sudo apt install -y nginx
+}
+
+install_nginx_rhel() {
+  if command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y nginx
+  else
+    sudo yum install -y epel-release
+    sudo yum install -y nginx
+  fi
+}
+
+install_nginx_arch() {
+  step "Installing Nginx (Arch / EndeavourOS)"
+
+  sudo pacman -Sy --noconfirm nginx
+
+  ok "Nginx installed"
+}
+
+install_nginx_alpine() {
+  sudo apk update
+  sudo apk add nginx
+}
+
+start_nginx() {
+  if command -v systemctl >/dev/null 2>&1; then
+    sudo systemctl enable nginx
+    sudo systemctl restart nginx
+  else
+    sudo nginx
+  fi
+}
+
+### ===============================
 ### START
 ### ===============================
 clear
-
-bold "Gajah Runtime Installer"
+bold "Gajah Web Services Installer"
 echo "────────────────────────────────────────"
-echo "Apache + PHP + MySQL Runtime"
+echo "Apache + PHP + MySQL + phpMyAdmin + Nginx"
 
 ### ===============================
 ### PREPARE
 ### ===============================
-
 step "Preparing directories"
 mkdir -p "$TEMP_DIR"
 sudo mkdir -p "$RUNTIME_DIR"
 ok "Directories ready"
 
 ### ===============================
-### DOWNLOAD APACHE
+### APACHE + PHP
 ### ===============================
 step "Downloading Apache + PHP runtime"
 download "$APACHE_URL" "$APACHE_ARCHIVE"
@@ -91,23 +125,27 @@ step "Extracting Apache + PHP runtime"
 extract "$APACHE_ARCHIVE" "$RUNTIME_ROOT"
 ok "Apache + PHP installed"
 
+### ===============================
+### PHPMYADMIN
+### ===============================
 step "Downloading phpMyAdmin"
 download "$PHPMYADMIN_URL" "$PHPMYADMIN_ARCHIVE"
 ok "phpMyAdmin downloaded"
 
 step "Extracting phpMyAdmin"
 sudo unzip -q "$PHPMYADMIN_ARCHIVE" -d "$RUNTIME_ROOT/runtime/www"
-sudo mv "$RUNTIME_ROOT/runtime/www/phpMyAdmin-5.2.3-all-languages" "$RUNTIME_ROOT/runtime/www/phpmyadmin"
+sudo mv "$RUNTIME_ROOT/runtime/www/phpMyAdmin-5.2.3-all-languages" \
+        "$RUNTIME_ROOT/runtime/www/phpmyadmin"
 ok "phpMyAdmin installed"
 
 step "Downloading phpMyAdmin configuration"
 download "$PHPMYADMIN_CONFIG_URL" "$TEMP_DIR/config.inc.php"
-sudo cp "$TEMP_DIR/config.inc.php" "$RUNTIME_ROOT/runtime/www/phpmyadmin/config.inc.php"
+sudo cp "$TEMP_DIR/config.inc.php" \
+        "$RUNTIME_ROOT/runtime/www/phpmyadmin/config.inc.php"
 ok "phpMyAdmin configuration ready"
 
-
 ### ===============================
-### DOWNLOAD MYSQL
+### MYSQL
 ### ===============================
 step "Downloading MySQL runtime"
 download "$MYSQL_URL" "$MYSQL_ARCHIVE"
@@ -116,57 +154,83 @@ ok "MySQL downloaded"
 step "Extracting MySQL runtime"
 extract "$MYSQL_ARCHIVE" "$RUNTIME_DIR"
 
-sudo ln -s \
+sudo ln -sf \
   "$RUNTIME_DIR/mysql-9.6.0-linux-glibc2.28-x86_64-minimal" \
   "$RUNTIME_DIR/mysql"
 
 ok "MySQL runtime installed"
 
-### ===============================q
+### ===============================
 ### MYSQL USER
 ### ===============================
 step "Configuring MySQL system user"
-
-if ! getent group mysql >/dev/null; then
-  sudo groupadd mysql
-fi
-
-if ! id mysql >/dev/null 2>&1; then
-  sudo useradd -r -g mysql -s /bin/false mysql
-fi
-
+getent group mysql >/dev/null || sudo groupadd mysql
+id mysql >/dev/null 2>&1 || sudo useradd -r -g mysql -s /bin/false mysql
 ok "MySQL user ready"
 
 ### ===============================
 ### MYSQL INIT
 ### ===============================
 step "Initializing MySQL data directory"
-
-# sudo chown -R mysql:mysql "$RUNTIME_DIR/mysql-9.6.0-linux-glibc2.28-x86_64-minimal"
-
 sudo "$RUNTIME_DIR/mysql/bin/mysqld" \
   --initialize-insecure \
-  --user=mysql \
-
+  --user=mysql
 ok "MySQL initialized (root password kosong)"
 
 ### ===============================
-### DONE
+### NGINX
 ### ===============================
+step "Installing Nginx"
+detect_os
+
+case "$OS_ID" in
+  ubuntu|debian)
+    install_nginx_debian
+    ;;
+  centos|rhel|rocky|almalinux|fedora)
+    install_nginx_rhel
+    ;;
+  alpine)
+    install_nginx_alpine
+    ;;
+  arch|endeavouros|manjaro)
+    install_nginx_arch
+    ;;
+  *)
+    if [[ "$OS_LIKE" == *debian* ]]; then
+      install_nginx_debian
+    elif [[ "$OS_LIKE" == *rhel* ]]; then
+      install_nginx_rhel
+    elif [[ "$OS_LIKE" == *arch* ]]; then
+      install_nginx_arch
+    else
+      die "OS tidak didukung untuk Nginx: $OS_ID"
+    fi
+    ;;
+esac
 
 
+start_nginx
+ok "Nginx installed & running"
 
+### ===============================
+### CLEANUP
+### ===============================
 if [ -d "$TEMP_DIR" ]; then
   step "Cleaning up temporary files"
   rm -rf "$TEMP_DIR"
   ok "Temporary files removed"
 fi
 
+### ===============================
+### DONE
+### ===============================
 echo
-green "🎉 Installation completed successfully!"
+green "🎉 Web Services installation completed!"
 echo
 echo "Next:"
-echo "  Start MySQL : $RUNTIME_DIR/mysql/bin/mysqld_safe &"
-echo "  Login       : $RUNTIME_DIR/mysql/bin/mysql -u root"
+echo "  Start Apache : /opt/apache/bin/httpd"
+echo "  Start MySQL  : $RUNTIME_DIR/mysql/bin/mysqld_safe &"
+echo "  Nginx test   : curl http://localhost"
 echo
-echo "🐘 Runtime siap dipakai."
+echo "🐘 Gajah runtime siap dipakai."
