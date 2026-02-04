@@ -128,6 +128,7 @@ class _HomeAppState extends State<HomeApp> {
               const SizedBox(height: 12),
               Row(
                 children: [
+              (Platform.isWindows) ?
                   _UtilityButton(
                     label: "HeidiSQL",
                     icon: Icons.storage,
@@ -135,13 +136,16 @@ class _HomeAppState extends State<HomeApp> {
                       "C:\\gajahweb\\heidisql\\heidisql.exe",
                       [],
                     ),
-                  ),
+                  ) : const SizedBox(height: 0, width: 0),
                   const SizedBox(width: 12),
                   _UtilityButton(
                     label: "Htdocs",
                     icon: Icons.folder,
-                    onTap: () =>
-                        startProgram('explorer.exe', ["C:\\gajahweb\\htdocs"]),
+                    onTap: () => {
+                            Platform.isWindows ?
+                            startProgram('explorer.exe', ["C:\\gajahweb\\htdocs"]): 
+                            startProgram("xdg-open", ["/opt/runtime/www"])
+                        },
                   ),
                 ],
               ),
