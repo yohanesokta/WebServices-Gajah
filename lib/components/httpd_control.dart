@@ -34,7 +34,6 @@ class _HttpdControlState extends State<HttpdControl>
     String prosessName = (Platform.operatingSystem == "linux")
         ? "httpd"
         : "httpd.exe";
-
     if (_isManualChanging) return;
     bool httpdIsRun = await checkProcess(prosessName);
     if (mounted) {
