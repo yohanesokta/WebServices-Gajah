@@ -18,7 +18,7 @@ class HomeApp extends StatefulWidget {
 }
 
 class _HomeAppState extends State<HomeApp> {
-  bool _isTerminalVisible = false;
+  bool _isTerminalVisible = Platform.isLinux;
   @override
 
   void initState() {
@@ -118,25 +118,34 @@ class _HomeAppState extends State<HomeApp> {
                   );
                 },
               ),
-              const SizedBox(height: 24),
+              (Platform.isWindows) ?
+              Column(
+                children: [
+                  const SizedBox(height: 24),
               const Text(
                 "Utilities",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
+
               const SizedBox(height: 12),
               const Xamppsameless(),
               const SizedBox(height: 12),
+                ],
+              ) : const SizedBox(height: 12),
+              
               Row(
                 children: [
-              (Platform.isWindows) ?
                   _UtilityButton(
-                    label: "HeidiSQL",
+                    label: Platform.isWindows ? "HeidiSQL" : "DBeaver",
                     icon: Icons.storage,
-                    onTap: () => startProgram(
-                      "C:\\gajahweb\\heidisql\\heidisql.exe",
-                      [],
-                    ),
-                  ) : const SizedBox(height: 0, width: 0),
+                    onTap: () => {
+                      (Platform.isWindows) ?
+                      startProgram(
+                        "C:\\gajahweb\\heidisql\\heidisql.exe",
+                        [],)
+                        : startProgram("/opt/runtime/dbeaver/dbeaver", [])
+                    },
+                  ) ,
                   const SizedBox(width: 12),
                   _UtilityButton(
                     label: "Htdocs",

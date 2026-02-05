@@ -59,11 +59,12 @@ class _NginxcontrolState extends State<Nginxcontrol>
         await Process.run("taskkill.exe", ["/F", "/IM", "php-cgi.exe"]);
       } else {
         // Stop Nginx and PHP-CGI on Linux
-        await Process.run(
+         Process.start(
           "pkexec",
-          ["systemctl", "stop", "nginx"],
+          ["/opt/runtime/php-cgi.sh","stop"],
+          mode: ProcessStartMode.inheritStdio,
+          runInShell: true,
         );
-        await Process.run("pkill", ["php-cgi"]);
       }
       sendTerminal("Menghentikan Proses [nginx.exe, php-cgi.exe]\nBerhasil!");
     } else {
@@ -83,21 +84,15 @@ class _NginxcontrolState extends State<Nginxcontrol>
         );
       } else {
         // Start Nginx and PHP-CGI on Linux
-        await Process.start(
-          "/opt/runtime/php-cgi.sh",
-          [],
-          mode: ProcessStartMode.detached,
-          runInShell: false,
-        );
-        await Process.start(
+        Process.start(
           "pkexec",
-          ["systemctl", "start", "nginx"],
-          mode: ProcessStartMode.detached,
-          runInShell: false,
+          ["/opt/runtime/php-cgi.sh","start"],
+          mode: ProcessStartMode.inheritStdio,
+          runInShell: true,
         );
       }
       sendTerminal(
-        "Memulai Nginx :$port\nMemulai php-cgi.exe :9000\nBerhasil!",
+        "Memulai Nginx :$port\nMemulai php-cgi :9000\nBerhasil!",
       );
     }
     if (mounted) {

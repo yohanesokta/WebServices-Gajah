@@ -12,6 +12,7 @@ APACHE_URL="https://github.com/yohanesokta/PHP-Apache_Binaries_Static/releases/d
 MYSQL_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/mysql-9.6.0-linux-glibc2.28-x86_64-minimal.tar.xz"
 PHPMYADMIN_URL="https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.zip"
 PHPMYADMIN_CONFIG_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/config.inc.php"
+DBEAVER_URL="https://dbeaver.io/files/dbeaver-ce-latest-linux.gtk.x86_64.tar.gz"
 
 APACHE_ARCHIVE="$TEMP_DIR/apache-php-linux_x86-64.tar.gz"
 MYSQL_ARCHIVE="$TEMP_DIR/mysql-9.6.0-linux-glibc2.28-x86_64-minimal.tar.xz"
@@ -145,6 +146,7 @@ step "Downloading phpMyAdmin configuration"
 download "$PHPMYADMIN_CONFIG_URL" "$TEMP_DIR/config.inc.php"
 sudo cp "$TEMP_DIR/config.inc.php" \
         "$RUNTIME_ROOT/runtime/www/phpmyadmin/config.inc.php"
+        
 ok "phpMyAdmin configuration ready"
 
 ### ===============================
@@ -214,7 +216,23 @@ esac
 
 
 start_nginx
+sudo systemctl disable nginx
 ok "Nginx installed & running"
+
+step "Configuring Gajah runtime scripts"
+sudo wget -q --show-progress -O $RUNTIME_DIR/php-cgi.sh https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-cgi.sh
+sudo chmod +x $RUNTIME_DIR/php-cgi.sh
+
+sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+sudo wget -q --show-progress -O /etc/nginx/nginx.conf https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/nginx.conf
+sudo systemctl restart nginx
+
+ok "Gajah runtime scripts ready"
+
+step "Installing Heidisql (Database Client)"
+download "$DBEAVER_URL" "$TEMP_DIR/dbeaver.tar.gz"
+sudo tar -xzf "$TEMP_DIR/dbeaver.tar.gz" -C "/opt/runtime"
+ok "Heidisql installed in /opt/runtime/dbeaver"
 
 ### ===============================
 ### CLEANUP
