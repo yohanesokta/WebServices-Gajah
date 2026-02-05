@@ -14,6 +14,8 @@ PHPMYADMIN_URL="https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-a
 PHPMYADMIN_CONFIG_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/config.inc.php"
 DBEAVER_URL="https://dbeaver.io/files/dbeaver-ce-latest-linux.gtk.x86_64.tar.gz"
 
+GAJAHWEB_APP_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/v2.1/gajahweb-linux_x86-64.tar.gz"
+
 APACHE_ARCHIVE="$TEMP_DIR/apache-php-linux_x86-64.tar.gz"
 MYSQL_ARCHIVE="$TEMP_DIR/mysql-9.6.0-linux-glibc2.28-x86_64-minimal.tar.xz"
 PHPMYADMIN_ARCHIVE="$TEMP_DIR/phpmyadmin-5.2.3.zip"
@@ -233,6 +235,13 @@ step "Installing Heidisql (Database Client)"
 download "$DBEAVER_URL" "$TEMP_DIR/dbeaver.tar.gz"
 sudo tar -xzf "$TEMP_DIR/dbeaver.tar.gz" -C "/opt/runtime"
 ok "Heidisql installed in /opt/runtime/dbeaver"
+
+step "Installing GajahWeb Application"
+download "$GAJAHWEB_APP_URL" "$TEMP_DIR/gajahweb-linux_x86-64.tar.gz"
+sudo mkdir -p "$RUNTIME_DIR/bin"
+sudo tar -xzf "$TEMP_DIR/gajahweb-linux_x86-64.tar.gz" -C "$RUNTIME_DIR/bin"
+sudo cp "$RUNTIME_DIR/bin/data/flutter_assets/resource/gajahweb.desktop" "/usr/share/applications/gajahweb.desktop"
+ok "GajahWeb Application installed in /opt/runtime/gajahweb"
 
 ### ===============================
 ### CLEANUP
