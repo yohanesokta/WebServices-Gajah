@@ -77,6 +77,8 @@ flutter:
     - resource/unzip.exe
     - resource/mariadb-port.bat
     - resource/nginx-port.bat
+    - resource/gajahweb.png
+    - resource/gajahweb.desktop
     - setup.bat
     - php-change-v.bat
   #   - images/a_dot_ham.jpeg

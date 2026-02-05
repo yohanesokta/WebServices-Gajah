@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=GajahWeb
+Comment=GajahWeb Application
+Exec=/opt/runtime/bin/gajahweb
+Icon=/opt/runtime/bin/data/flutter_assets/resource/gajahweb.png
+Terminal=false
+Categories=Development;Utility;
+StartupNotify=true
