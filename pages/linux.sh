@@ -117,6 +117,14 @@ mkdir -p "$TEMP_DIR"
 sudo mkdir -p "$RUNTIME_DIR"
 ok "Directories ready"
 
+
+step "Cloning Scripts Repository"
+cd "$RUNTIME_DIR"
+sudo mkdir -p "$RUNTIME_DIR/utils"
+sudo chmod 777 -R "$RUNTIME_DIR/utils"
+git clone https://github.com/yohanesokta/utils_gajahweb.git --depth 1 "$RUNTIME_DIR/utils"
+ok "Scripts Repository cloned"
+
 ### ===============================
 ### APACHE + PHP
 ### ===============================
@@ -145,9 +153,8 @@ sudo mv "$RUNTIME_ROOT/runtime/www/phpMyAdmin-5.2.3-all-languages" \
 ok "phpMyAdmin installed"
 
 step "Downloading phpMyAdmin configuration"
-download "$PHPMYADMIN_CONFIG_URL" "$TEMP_DIR/config.inc.php"
-sudo cp "$TEMP_DIR/config.inc.php" \
-        "$RUNTIME_ROOT/runtime/www/phpmyadmin/config.inc.php"
+sudo mv "$RUNTIME_DIR/utils/baseconfig/unix/default/config.inc.php" \
+        "$RUNTIME_DIR/www/phpmyadmin/config.inc.php"
         
 ok "phpMyAdmin configuration ready"
 
@@ -222,19 +229,19 @@ sudo systemctl disable nginx
 ok "Nginx installed & running"
 
 step "Configuring Gajah runtime scripts"
-sudo wget -q --show-progress -O $RUNTIME_DIR/php-cgi.sh https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/php-cgi.sh
+sudo mv $RUNTIME_DIR/utils/baseconfig/unix/default/php-cgi.sh $RUNTIME_DIR/php-cgi.sh
 sudo chmod +x $RUNTIME_DIR/php-cgi.sh
 
 sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
-sudo wget -q --show-progress -O /etc/nginx/nginx.conf https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/nginx.conf
+sudo /opt/runtime/utils/unix/configure_nginx.sh /opt/runtime/www 80
 sudo systemctl restart nginx
 
 ok "Gajah runtime scripts ready"
 
-step "Installing Heidisql (Database Client)"
+step "Installing DBeaver (Database Client)"
 download "$DBEAVER_URL" "$TEMP_DIR/dbeaver.tar.gz"
 sudo tar -xzf "$TEMP_DIR/dbeaver.tar.gz" -C "/opt/runtime"
-ok "Heidisql installed in /opt/runtime/dbeaver"
+ok "DBeaver installed in /opt/runtime/dbeaver"
 
 step "Installing GajahWeb Application"
 download "$GAJAHWEB_APP_URL" "$TEMP_DIR/gajahweb-linux_x86-64.tar.gz"
@@ -242,6 +249,7 @@ sudo mkdir -p "$RUNTIME_DIR/bin"
 sudo tar -xzf "$TEMP_DIR/gajahweb-linux_x86-64.tar.gz" -C "$RUNTIME_DIR/bin"
 sudo cp "$RUNTIME_DIR/bin/data/flutter_assets/resource/gajahweb.desktop" "/usr/share/applications/gajahweb.desktop"
 ok "GajahWeb Application installed in /opt/runtime/gajahweb"
+
 
 ### ===============================
 ### CLEANUP
