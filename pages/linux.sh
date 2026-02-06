@@ -9,7 +9,7 @@ RUNTIME_DIR="/opt/runtime"
 TEMP_DIR="$HOME/gajah_temp"
 
 APACHE_URL="https://github.com/yohanesokta/PHP-Apache_Binaries_Static/releases/download/build-20251229-7/apache-php-linux_x86-64.tar.gz"
-MYSQL_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/mysql-9.6.0-linux-glibc2.28-x86_64-minimal.tar.xz"
+MYSQL_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/mariadb-10.11.10-linux-systemd-x86_64.tar.gz"
 PHPMYADMIN_URL="https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.zip"
 PHPMYADMIN_CONFIG_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/config.inc.php"
 DBEAVER_URL="https://dbeaver.io/files/dbeaver-ce-latest-linux.gtk.x86_64.tar.gz"
@@ -17,7 +17,7 @@ DBEAVER_URL="https://dbeaver.io/files/dbeaver-ce-latest-linux.gtk.x86_64.tar.gz"
 GAJAHWEB_APP_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/v2.1/gajahweb-linux_x86-64.tar.gz"
 
 APACHE_ARCHIVE="$TEMP_DIR/apache-php-linux_x86-64.tar.gz"
-MYSQL_ARCHIVE="$TEMP_DIR/mysql-9.6.0-linux-glibc2.28-x86_64-minimal.tar.xz"
+MYSQL_ARCHIVE="$TEMP_DIR/mariadb-10.11.10-linux-systemd-x86_64.tar.gz"
 PHPMYADMIN_ARCHIVE="$TEMP_DIR/phpmyadmin-5.2.3.zip"
 
 ### ===============================
@@ -107,7 +107,7 @@ start_nginx() {
 clear
 bold "Gajah Web Services Installer"
 echo "────────────────────────────────────────"
-echo "Apache + PHP + MySQL + phpMyAdmin + Nginx"
+echo "Apache + PHP + MariaDB + phpMyAdmin + Nginx"
 
 ### ===============================
 ### PREPARE
@@ -159,37 +159,38 @@ sudo mv "$RUNTIME_DIR/utils/baseconfig/unix/default/config.inc.php" \
 ok "phpMyAdmin configuration ready"
 
 ### ===============================
-### MYSQL
+### MARIADB
 ### ===============================
-step "Downloading MySQL runtime"
+step "Downloading MariaDB runtime"
 download "$MYSQL_URL" "$MYSQL_ARCHIVE"
-ok "MySQL downloaded"
+ok "MariaDB downloaded"
 
-step "Extracting MySQL runtime"
+step "Extracting MariaDB runtime"
 extract "$MYSQL_ARCHIVE" "$RUNTIME_DIR"
 
 sudo ln -sf \
-  "$RUNTIME_DIR/mysql-9.6.0-linux-glibc2.28-x86_64-minimal" \
+  "$RUNTIME_DIR/mariadb-10.11.10-linux-systemd-x86_64" \
   "$RUNTIME_DIR/mysql"
 
-ok "MySQL runtime installed"
+ok "MariaDB runtime installed"
 
 ### ===============================
-### MYSQL USER
+### MARIADB USER
 ### ===============================
-step "Configuring MySQL system user"
+step "Configuring MariaDB system user"
 getent group mysql >/dev/null || sudo groupadd mysql
 id mysql >/dev/null 2>&1 || sudo useradd -r -g mysql -s /bin/false mysql
-ok "MySQL user ready"
+ok "MariaDB user ready"
 
 ### ===============================
-### MYSQL INIT
+### MARIADB INIT
 ### ===============================
-step "Initializing MySQL data directory"
-sudo "$RUNTIME_DIR/mysql/bin/mysqld" \
-  --initialize-insecure \
-  --user=mysql
-ok "MySQL initialized (root password kosong)"
+step "Initializing MariaDB data directory"
+sudo "$RUNTIME_DIR/mysql/scripts/mysql_install_db" \
+  --user=mysql \
+  --basedir="$RUNTIME_DIR/mysql" \
+  --datadir="$RUNTIME_DIR/mysql/data"
+ok "MariaDB initialized (root password kosong)"
 
 ### ===============================
 ### NGINX
@@ -268,7 +269,7 @@ green "🎉 Web Services installation completed!"
 echo
 echo "Next:"
 echo "  Start Apache : /opt/apache/bin/httpd"
-echo "  Start MySQL  : $RUNTIME_DIR/mysql/bin/mysqld_safe &"
+echo "  Start MariaDB: $RUNTIME_DIR/mysql/bin/mysqld_safe &"
 echo "  Nginx test   : curl http://localhost"
 echo
 echo "🐘 Gajah runtime siap dipakai."
