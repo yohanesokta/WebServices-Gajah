@@ -150,7 +150,7 @@ class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObse
   }
 
   final String runtimeName = "MariaDB";
-  final String assetsImage = Platform.operatingSystem == "linux" ? "assets/mariadb.png" : "assets/mariadb.png";
+  final String assetsImage = "assets/mariadb.png";
   @override
   Widget build(BuildContext context) {
     return ServiceControlCard(
