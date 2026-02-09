@@ -14,7 +14,6 @@ mkdir %OUTDIR%\var
 mkdir %OUTDIR%\tmp
 unzip.exe -o config.zip -d %OUTDIR%\config
 
-
 :nginx
 echo "Download Nginx 1.28.0 [1 of 7]"
 if exist "%OUTDIR%\nginx" ( 
@@ -40,6 +39,7 @@ mkdir %OUTDIR%\php\tmp
 if exist "%OUTDIR%\mariadb" ( 
     goto phpmyadmin
 )
+
 echo "Download MariaDB (MYSQL Server) [3 of 7]"
 wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/mariadb-12.0.2-winx64.zip -O %OUTDIR%\mariadb-12.zip
 unzip.exe -o %OUTDIR%\mariadb-12.zip -d %OUTDIR%\tmp\
@@ -50,6 +50,7 @@ move "%OUTDIR%\tmp\mariadb-12.0.2-winx64" "%OUTDIR%\mariadb"
 if exist "%OUTDIR%\htdocs\phpmyadmin" ( 
     goto redis
 )
+
 echo "Download phpMyAdmin [4 of 7]"
 wget.exe https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/phpMyAdmin-5.2.2-all-languages.zip -O %OUTDIR%\phpMyAdmin.zip
 unzip.exe -o %OUTDIR%\phpMyAdmin.zip -d %OUTDIR%\tmp\
