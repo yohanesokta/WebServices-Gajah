@@ -9,20 +9,20 @@ RUNTIME_DIR="/opt/runtime"
 TEMP_DIR="$HOME/gajah_temp"
 
 APACHE_URL="https://github.com/yohanesokta/PHP-Apache_Binaries_Static/releases/download/build-20251229-7/apache-php-linux_x86-64.tar.gz"
-MYSQL_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/mariadb-10.11.10-linux-systemd-x86_64.tar.gz"
+MYSQL_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/mariadb-10.11.16-linux-systemd-x86_64.tar.gz"
 PHPMYADMIN_URL="https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.zip"
 PHPMYADMIN_CONFIG_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/config.inc.php"
 DBEAVER_URL="https://dbeaver.io/files/dbeaver-ce-latest-linux.gtk.x86_64.tar.gz"
-
 GAJAHWEB_APP_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/v2.1/gajahweb-linux_x86-64.tar.gz"
 
 APACHE_ARCHIVE="$TEMP_DIR/apache-php-linux_x86-64.tar.gz"
-MYSQL_ARCHIVE="$TEMP_DIR/mariadb-10.11.10-linux-systemd-x86_64.tar.gz"
+MYSQL_ARCHIVE="$TEMP_DIR/mariadb-10.11.16-linux-systemd-x86_64.tar.gz"
 PHPMYADMIN_ARCHIVE="$TEMP_DIR/phpmyadmin-5.2.3.zip"
 
 ### ===============================
 ### UI HELPERS
 ### ===============================
+
 bold()   { echo -e "\033[1m$1\033[0m"; }
 green()  { echo -e "\033[32m$1\033[0m"; }
 yellow() { echo -e "\033[33m$1\033[0m"; }
@@ -35,6 +35,7 @@ die()  { red "✖ $1"; exit 1; }
 ### ===============================
 ### UTIL
 ### ===============================
+
 download() {
   local url="$1" out="$2"
   if command -v wget >/dev/null 2>&1; then
@@ -117,7 +118,6 @@ mkdir -p "$TEMP_DIR"
 sudo mkdir -p "$RUNTIME_DIR"
 ok "Directories ready"
 
-
 step "Cloning Scripts Repository"
 cd "$RUNTIME_DIR"
 sudo mkdir -p "$RUNTIME_DIR/utils"
@@ -169,7 +169,7 @@ step "Extracting MariaDB runtime"
 extract "$MYSQL_ARCHIVE" "$RUNTIME_DIR"
 
 sudo ln -sf \
-  "$RUNTIME_DIR/mariadb-10.11.10-linux-systemd-x86_64" \
+  "$RUNTIME_DIR/mariadb-10.11.16-linux-systemd-x86_64" \
   "$RUNTIME_DIR/mysql"
 
 ok "MariaDB runtime installed"
@@ -191,6 +191,13 @@ sudo "$RUNTIME_DIR/mysql/scripts/mysql_install_db" \
   --basedir="$RUNTIME_DIR/mysql" \
   --datadir="$RUNTIME_DIR/mysql/data"
 ok "MariaDB initialized (root password kosong)"
+
+sudo -u mysql "$RUNTIME_DIR/mysql/bin/mysqld_safe" --basedir="$RUNTIME_DIR/mysql" &
+sleep 3
+sudo -u root "$RUNTIME_DIR/mysql/bin/mysql" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root123'; FLUSH PRIVILEGES;"
+ok "MariaDB root password diset ke 'root123'"
+sleep 2
+sudo "$RUNTIME_DIR/mysql/bin/mysqladmin" -u root -proot123 shutdown
 
 ### ===============================
 ### NGINX
@@ -226,7 +233,7 @@ esac
 
 
 start_nginx
-sudo systemctl disable nginx
+sudo systemctl disable --now nginx
 ok "Nginx installed & running"
 
 step "Configuring Gajah runtime scripts"
@@ -264,6 +271,7 @@ fi
 ### ===============================
 ### DONE
 ### ===============================
+
 echo
 green "🎉 Web Services installation completed!"
 echo
