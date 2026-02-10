@@ -1,0 +1,48 @@
+name: Build Flutter Linux (DEBIAN 10)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:10
+
+    steps:
+      - name: Install dependencies
+        run: |
+          apt update
+          apt install -y \
+            git curl unzip xz-utils zip \
+            libglu1-mesa clang cmake ninja-build pkg-config \
+            libgtk-3-dev libblkid-dev liblzma-dev
+
+      - name: Install Flutter
+        run: |
+          git clone https://github.com/flutter/flutter.git -b stable /flutter
+          echo "/flutter/bin" >> $GITHUB_PATH
+
+      - name: Flutter doctor
+        run: flutter doctor
+
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Build Linux
+        run: |
+          flutter config --enable-linux-desktop
+          flutter pub get
+          flutter build linux --release
+
+      - name: Check glibc target
+        run: |
+          strings build/linux/x64/release/bundle/* | grep GLIBC_ || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-linux-debian10
+          path: build/linux/x64/release/bundle
