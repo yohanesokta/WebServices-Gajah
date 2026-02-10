@@ -59,7 +59,7 @@ class _MariadbcontrolState extends State<Mariadbcontrol> with WidgetsBindingObse
         } else {
           await Process.start(
             "pkexec",
-            ["sudo","-u","mysql","/opt/runtime/mysql/bin/mysqld"],
+            ["sudo","-u","mysql","/opt/runtime/mysql/bin/mysqld","--datadir=/opt/runtime/mysql/data"],
             mode: ProcessStartMode.inheritStdio,
             workingDirectory: "/opt/runtime/mysql",
             runInShell: true,

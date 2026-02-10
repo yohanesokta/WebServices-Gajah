@@ -13,6 +13,8 @@ class _SettingsState extends State<Settings> {
   final TextEditingController _nginxPort = TextEditingController();
   final TextEditingController _mariadbPort = TextEditingController();
   final TextEditingController _postgresqlPort = TextEditingController();
+  final TextEditingController _apachePort =
+      TextEditingController();
   String _htdocsPath = "C:\\gajahweb\\htdocs";
   bool onEdits = false;
 
@@ -25,6 +27,7 @@ class _SettingsState extends State<Settings> {
       _mariadbPort.text = preferences.getString("mariadbPort") ?? "3306";
       _postgresqlPort.text = preferences.getString("postgresqlPort") ?? "5432";
       _htdocsPath = preferences.getString("htdocs") ?? "C:\\gajahweb\\htdocs";
+      _apachePort.text = preferences.getString("apachePort") ?? "80";
     });
   }
 
@@ -36,38 +39,65 @@ class _SettingsState extends State<Settings> {
         preferences.getString("postgresqlPort") ?? "5473";
    
     if (nginxPort != _nginxPort.text) {
+      if (Platform.isWindows) {
       await Process.run(
         "cmd.exe",
         ['/c', 'nginx-port.bat', _nginxPort.text, _htdocsPath],
         runInShell: true,
         workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
       );
+      } else {
+        await Process.run("pkexec",
+        ["bash", "/opt/runtime/utils/unix/configure_nginx.sh",_htdocsPath , _nginxPort.text ],
+        runInShell: true,
+        workingDirectory: "/opt/runtime/utils");
+      }
       await preferences.setString('nginxPort', _nginxPort.text);
     }
 
     if (mariadbPort != _mariadbPort.text) {
+      if (Platform.isWindows) {
       await Process.run(
         "cmd.exe",
         ['/c', 'mariadb-port.bat', _mariadbPort.text],
         runInShell: true,
         workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
       );
+      } else {
+        await Process.run("pkexec",
+        ["bash", "/opt/runtime/utils/unix/configure_mariadb.sh", _mariadbPort.text],
+        runInShell: true,
+        workingDirectory: "/opt/runtime/utils");
+      }
       await preferences.setString("mariadbPort", _mariadbPort.text);
     }
 
     if (postgresqlPort != _postgresqlPort.text) {
+      if (Platform.isWindows) {
       await Process.run(
         "cmd.exe",
         ["/c", "postgres-port.bat", _postgresqlPort.text],
         runInShell: true,
         workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
       );
+      }
       await preferences.setString("postgresqlPort", _postgresqlPort.text);
     }
 
+
+    if (_apachePort.text != preferences.getString("apachePort")) {
+      if (Platform.isLinux) {
+        await Process.run("pkexec",
+        ["bash", "/opt/runtime/utils/unix/configure_apache.sh",_htdocsPath , _apachePort.text ],
+        runInShell: true,
+        workingDirectory: "/opt/runtime/utils");
+      }
+      await preferences.setString('apachePort', _apachePort.text);
+
      setState(() {
       onEdits = false;
-    });
+      });
+    }
   }
 
   Future<void> _openFilesNotepad(String filePath) async {
@@ -121,6 +151,8 @@ class _SettingsState extends State<Settings> {
             _buildPortSetting("MariaDB Port", _mariadbPort),
             _buildDivider(),
             _buildPortSetting("PostgreSQL Port", _postgresqlPort),
+            _buildDivider(),
+            _buildPortSetting("Apache Port", _apachePort),
           ]),
           const SizedBox(height: 24),
           _buildSectionTitle("Configuration Files"),
