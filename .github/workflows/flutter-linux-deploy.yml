@@ -12,6 +12,12 @@ jobs:
       image: debian:10
 
     steps:
+      - name: Fix Debian 10 repo
+        run: |
+            sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list
+            sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list
+            echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid
+              
       - name: Install dependencies
         run: |
           apt update
