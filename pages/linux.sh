@@ -206,7 +206,7 @@ step "Installing Nginx"
 detect_os
 
 case "$OS_ID" in
-  ubuntu|debian)
+  ubuntu|debian|linuxmint)
     install_nginx_debian
     ;;
   centos|rhel|rocky|almalinux|fedora)
