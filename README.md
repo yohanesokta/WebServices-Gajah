@@ -121,5 +121,7 @@ Dirilis di bawah [Lisensi MIT](https://opensource.org/licenses/MIT).
 
 <img width="110" src="https://riset-tif.sakera.id/www/logo-tif.png"> 
 
-Kami mengundang Anda untuk mencoba aplikasi ini dan lainya yang dikembangkan sebagai proyek kampus. Lihat [Riset TIF TRUNOJOYO](https://riset-tif.sakera.id)
+Kami mengundang Anda untuk mencoba aplikasi ini dan lainya yang dikembangkan sebagai proyek kampus. 
+
+Lihat [RISET TIF TRUNOJOYO](https://riset-tif.sakera.id)
 </div>

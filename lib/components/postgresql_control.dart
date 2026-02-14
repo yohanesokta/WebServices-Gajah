@@ -42,9 +42,9 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> with WidgetsBindi
     if (value) {
        await Process.start(
         "$postgresPath\\postgres.exe",
-        ["-D", "C:\\gajahweb\\postgres\\data"],
+        ["-D", "$postgresPath\\data"],
         runInShell: false,
-        mode: ProcessStartMode.detached,
+        mode: ProcessStartMode.inheritStdio,
         workingDirectory: postgresPath,
       );
       sendTerminal("Berhasil Menjalankan Postgresql Server [postgres.exe]");
@@ -69,7 +69,7 @@ class _PostgresqlcontrolState extends State<Postgresqlcontrol> with WidgetsBindi
       ["/c", "start", "psql.exe", "-U", "postgres"],
       workingDirectory: postgresPath,
       runInShell: true,
-      mode: ProcessStartMode.detached,
+      mode: ProcessStartMode.inheritStdio,
     );
   }
 
