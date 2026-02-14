@@ -18,7 +18,7 @@
 
 ---
 
-### 🤔 Mengapa Gajah Webserver?
+###  Mengapa Gajah Webserver?
 
 Bagi developer yang bekerja di Windows atau Linux, mengelola beberapa layanan web secara terpisah seringkali merepotkan. Proses start/stop service, mengganti versi PHP, atau sekadar melihat log membutuhkan banyak intervensi manual melalui command line atau skrip yang tersebar.
 
@@ -34,20 +34,7 @@ Bagi developer yang bekerja di Windows atau Linux, mengelola beberapa layanan we
 
 </div>
 
-
-
-### Fitur Utama
-
-| Fitur | Deskripsi |
-| :--- | :--- |
-|**Kontrol Layanan** | Start/stop Nginx, PHP-CGI, MariaDB, PostgreSQL, dan Redis dengan satu klik. Aplikasi akan otomatis mendeteksi status proses dan port yang digunakan. |
-| **PHP Version Switcher** | Ganti versi PHP secara dinamis. Unduh versi PHP (stabil atau arsip) langsung dari API, dan aplikasi akan menangani proses setup path secara otomatis. |
-|**Konfigurasi Cepat** | Ubah port default untuk setiap layanan dan buka file konfigurasi penting (`php.ini`, `nginx.conf`, `my.ini`) langsung dari menu Settings. |
-| **Terminal Terintegrasi** | Pantau log dari semua layanan secara realtime dalam satu tampilan terminal terpadu di dalam aplikasi. Tidak perlu membuka banyak window `cmd`. |
-| **XAMPP-sameless Mode** | Fitur unik untuk beralih direktori `htdocs` antara environment Gajah Webserver (`C:\gajahweb\htdocs`) dan instalasi XAMPP yang sudah ada (`C:\xampp\htdocs`). |
-|**Akses Cepat CLI** | Disediakan shortcut untuk membuka *command line interface* (CLI) seperti `psql` dan `redis-cli` dengan konteks environment yang sudah sesuai. |
-
-### 📦 Instalasi & Setup
+### Instalasi & Setup
 
 #### 1. Prasyarat
 
@@ -96,15 +83,7 @@ Pastikan perangkat Anda telah terinstall:
         flutter run -d linux
         ```
 
-### 🗺️ Roadmap Pengembangan
-
-Berikut adalah beberapa rencana fitur untuk Gajah Webserver di masa depan:
-- [ ] **Dukungan Apache (httpd):** Menambahkan kontrol untuk Apache Web Server.
-- [ ] **UI/UX Refresh:** Pembaruan antarmuka agar lebih modern dan intuitif.
-- [ ] **Konfigurasi vhost:** Fitur untuk mengelola virtual host Nginx/Apache dari GUI.
-- [ ] **Plugin System:** Arsitektur plugin untuk menambahkan dukungan layanan lain.
-
-### 🧪 Menjalankan Test
+### Menjalankan Test
 
 - **Jalankan semua test:**
   ```bash
@@ -128,8 +107,19 @@ Test suite yang tersedia (ringkasan):
 
 ### 🤝 Kontribusi
 
-Kontribusi sangat kami harapkan! Silakan buka *Issue* atau *Pull Request*.
+Kontribusi sangat kami harapkan! Silakan buka [Issue](https://github.com/yohanesokta/WebServices-Gajah/issues) atau [Pull Request](https://github.com/yohanesokta/WebServices-Gajah/pulls).
+
 
 ### 📄 Lisensi
 
 Dirilis di bawah [Lisensi MIT](https://opensource.org/licenses/MIT).
+
+
+## SUPPORT
+
+<div align="center">
+
+<img width="110" src="https://riset-tif.sakera.id/www/logo-tif.png"> 
+
+Kami mengundang Anda untuk mencoba aplikasi ini dan lainya yang dikembangkan sebagai proyek kampus. Lihat [Riset TIF TRUNOJOYO](https://riset-tif.sakera.id)
+</div>
