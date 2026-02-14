@@ -188,7 +188,7 @@ class _HomeAppState extends State<HomeApp> {
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Row(
             children: [
-              const Text("Build v2.1", style: TextStyle(fontSize: 12)),
+              const Text("Build v2.3", style: TextStyle(fontSize: 12)),
               const Spacer(),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, "/about"),
