@@ -74,7 +74,7 @@ flutter:
     - setup.bat
     - php-change-v.bat
     - utils/windows/
-    - utils/windows/bin
+    - utils/windows/bin/
     - utils/baseconfig/windows/
 
     # - resource/config.zip
