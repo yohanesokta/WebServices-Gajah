@@ -1,8 +1,6 @@
 name: Build Flutter Linux (DEBIAN 10)
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
