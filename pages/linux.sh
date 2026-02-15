@@ -153,7 +153,7 @@ sudo mv "$RUNTIME_ROOT/runtime/www/phpMyAdmin-5.2.3-all-languages" \
 ok "phpMyAdmin installed"
 
 step "Downloading phpMyAdmin configuration"
-sudo mv "$RUNTIME_DIR/utils/baseconfig/unix/default/config.inc.php" \
+sudo mv "$RUNTIME_DIR/utils/baseconfig/unix/default/config.inc.txt" \
         "$RUNTIME_DIR/www/phpmyadmin/config.inc.php"
         
 ok "phpMyAdmin configuration ready"
