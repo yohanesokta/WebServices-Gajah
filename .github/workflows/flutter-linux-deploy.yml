@@ -55,7 +55,7 @@ jobs:
           strings build/linux/x64/release/bundle/* | grep GLIBC_ || true
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: flutter-linux-debian10
           path: build/linux/x64/release/bundle
