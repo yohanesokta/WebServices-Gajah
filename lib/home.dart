@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gajahweb/components/httpd_control.dart';
 import 'package:gajahweb/components/information.dart';
+import 'package:gajahweb/components/pgadmin_control.dart';
 import 'package:gajahweb/components/postgresql_control.dart';
 import 'package:gajahweb/components/xampp_sameless.dart';
 import 'package:gajahweb/utils/process.dart';
@@ -33,6 +34,7 @@ class _HomeAppState extends State<HomeApp> {
       const Mariadbcontrol(),
       const Nginxcontrol(),
       const Postgresqlcontrol(),
+      const Pgadmincontrol(),
       const Rediscontrol(),
     ];
 
