@@ -135,16 +135,6 @@ class _HomeAppState extends State<HomeApp> {
               
               Row(
                 children: [
-                  (Platform.isWindows) ? _UtilityButton(
-                    label: "HeidiSQL",
-                    icon: Icons.storage,
-                    onTap: () => {
-                      startProgram(
-                        "C:\\gajahweb\\heidisql\\heidisql.exe",
-                        [],)
-                    },
-                  )
-                  : const SizedBox(width: 0),
                   const SizedBox(width: 12),
                   _UtilityButton(
                     label: "DBeaver",
