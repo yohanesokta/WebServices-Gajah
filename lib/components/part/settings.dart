@@ -33,24 +33,30 @@ class _SettingsState extends State<Settings> {
     final String nginxPort = preferences.getString("nginxPort") ?? "80";
     final String mariadbPort = preferences.getString("mariadbPort") ?? "3306";
     final String postgresqlPort =
-        preferences.getString("postgresqlPort") ?? "5473";
-   
+        preferences.getString("postgresqlPort") ?? "5432";
+
+    String executablePath = File(Platform.resolvedExecutable).parent.path;
+    String utilsPath = "$executablePath\\data\\flutter_assets\\utils\\windows";
+
     if (nginxPort != _nginxPort.text) {
-      await Process.run(
+      final process = await Process.run(
         "cmd.exe",
-        ['/c', 'nginx-port.bat', _nginxPort.text, _htdocsPath],
+        ['/c', '$utilsPath\\nginx-port.bat', _nginxPort.text, _htdocsPath],
         runInShell: true,
-        workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
+        workingDirectory: utilsPath,
       );
+
+      final String output = process.stdout.toString();
+      print(output);
       await preferences.setString('nginxPort', _nginxPort.text);
     }
 
     if (mariadbPort != _mariadbPort.text) {
       await Process.run(
         "cmd.exe",
-        ['/c', 'mariadb-port.bat', _mariadbPort.text],
+        ['/c', '$utilsPath\\mariadb-port.bat', _mariadbPort.text],
         runInShell: true,
-        workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
+        workingDirectory: utilsPath,
       );
       await preferences.setString("mariadbPort", _mariadbPort.text);
     }
@@ -58,14 +64,14 @@ class _SettingsState extends State<Settings> {
     if (postgresqlPort != _postgresqlPort.text) {
       await Process.run(
         "cmd.exe",
-        ["/c", "postgres-port.bat", _postgresqlPort.text],
+        ["/c", "$utilsPath\\postgres-port.bat", _postgresqlPort.text],
         runInShell: true,
-        workingDirectory: "C:\\gajahweb\\data\\flutter_assets\\resource",
+        workingDirectory: utilsPath,
       );
       await preferences.setString("postgresqlPort", _postgresqlPort.text);
     }
 
-     setState(() {
+    setState(() {
       onEdits = false;
     });
   }
@@ -103,10 +109,7 @@ class _SettingsState extends State<Settings> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text(
-              "Apply",
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text("Apply", style: TextStyle(color: Colors.white)),
           ),
           const SizedBox(width: 16),
         ],
@@ -178,9 +181,7 @@ class _SettingsState extends State<Settings> {
         color: const Color(0xFF2C2C2E),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 
@@ -189,7 +190,12 @@ class _SettingsState extends State<Settings> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: const TextStyle(fontSize: 16, color: Colors.white))),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ),
           SizedBox(
             width: 80,
             child: TextField(
@@ -213,12 +219,24 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  Widget _buildFileLink(String title, String path, IconData icon, String subtitle) {
+  Widget _buildFileLink(
+    String title,
+    String path,
+    IconData icon,
+    String subtitle,
+  ) {
     return ListTile(
       leading: Icon(icon, color: Colors.grey),
       title: Text(title, style: const TextStyle(color: Colors.white)),
-      subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(color: Colors.grey, fontSize: 12),
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: Colors.grey,
+      ),
       onTap: () => _openFilesNotepad(path),
     );
   }
