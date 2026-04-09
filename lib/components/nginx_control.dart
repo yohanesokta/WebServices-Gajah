@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gajahweb/components/service_control_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,9 +58,9 @@ class _NginxcontrolState extends State<Nginxcontrol>
         await Process.run("taskkill.exe", ["/F", "/IM", "php-cgi.exe"]);
       } else {
         // Stop Nginx and PHP-CGI on Linux
-         Process.start(
+        Process.start(
           "pkexec",
-          ["/opt/runtime/php-cgi.sh","stop"],
+          ["/opt/runtime/php-cgi.sh", "stop"],
           mode: ProcessStartMode.inheritStdio,
           runInShell: true,
         );
@@ -86,14 +85,12 @@ class _NginxcontrolState extends State<Nginxcontrol>
         // Start Nginx and PHP-CGI on Linux
         Process.start(
           "pkexec",
-          ["/opt/runtime/php-cgi.sh","start"],
+          ["/opt/runtime/php-cgi.sh", "start"],
           mode: ProcessStartMode.inheritStdio,
           runInShell: true,
         );
       }
-      sendTerminal(
-        "Memulai Nginx :$port\nMemulai php-cgi :9000\nBerhasil!",
-      );
+      sendTerminal("Memulai Nginx :$port\nMemulai php-cgi :9000\nBerhasil!");
     }
     if (mounted) {
       setState(() {

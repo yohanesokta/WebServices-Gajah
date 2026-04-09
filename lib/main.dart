@@ -8,12 +8,16 @@ import 'package:gajahweb/components/part/download.dart';
 import 'package:gajahweb/components/part/settings.dart';
 import 'package:gajahweb/utils/slide_left_route.dart';
 import 'package:gajahweb/utils/terminal_context.dart';
+import 'package:gajahweb/utils/process.dart';
 import 'home.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
+
+  // Initialize process monitoring for Windows
+  initProcessMonitoring();
 
   final appDirectory = await getApplicationDocumentsDirectory();
   await configureNetworkTools(appDirectory.path, enableDebugging: true);

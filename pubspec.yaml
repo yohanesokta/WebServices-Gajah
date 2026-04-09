@@ -76,16 +76,17 @@ flutter:
     - utils/windows/
     - utils/windows/bin/
     - utils/baseconfig/windows/
-
-    # - resource/config.zip
-    # - resource/wget.exe
-    # - resource/mariadb-generate-data.bat
-    # - resource/postgres-port.bat
-    # - resource/unzip.exe
-    # - resource/mariadb-port.bat
-    # - resource/nginx-port.bat
-    # - resource/gajahweb.png
-    # - resource/gajahweb.desktop
+    # ==== BACKWARD COMPATIBLE RESOURCE ====
+    - resource/config.zip
+    - resource/wget.exe
+    - resource/mariadb-generate-data.bat
+    - resource/postgres-port.bat
+    - resource/unzip.exe
+    - resource/mariadb-port.bat
+    - resource/nginx-port.bat
+    # ==== BACKWARD COMPATIBLE RESOURCE ====
+    - resource/gajahweb.png
+    - resource/gajahweb.desktop
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
