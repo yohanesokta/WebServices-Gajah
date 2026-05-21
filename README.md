@@ -2,6 +2,78 @@
 
 # Gajah Webserver
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
+[![Platform: Linux](https://img.shields.io/badge/Platform-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://www.linux.org/)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-2.4.0-%23FE5196?style=for-the-badge&logo=conventionalcommits)](https://conventionalcommits.org)
+
+[![CI – Flutter Tests](https://github.com/yohanesokta/WebServices-Gajah/actions/workflows/flutter-tests.yml/badge.svg)](https://github.com/yohanesokta/WebServices-Gajah/actions/workflows/flutter-tests.yml)
+
+Gajah Webserver is a desktop control panel (built with Flutter) for managing local web services and runtimes on Windows and Linux.
+
+Latest release: [2.4](https://github.com/yohanesokta/WebServices-Gajah/releases/tag/2.4)
+
+Manajemen Web Stack Lokal untuk Windows dan Linux.
+
+Gajah Webserver menyediakan satu antarmuka grafis untuk mengelola Nginx, Apache, MariaDB, PostgreSQL, Redis, dan runtime PHP secara lokal. Tujuannya adalah mempermudah pengembangan web dengan kontrol layanan, versi PHP, dan akses utilitas basis data dari satu aplikasi.
+
+### Demo Aplikasi
+
+<div align="center">
+
+![App Demo Placeholder](./pages/example2.png)
+
+Contoh demo aplikasi
+
+### Fitur
+
+Gajah Webserver menyediakan fitur-fitur berikut untuk menyederhanakan workflow pengembangan lokal:
+
+- **Manajemen Service Terpusat:** Kontrol (Start/Stop/Restart) untuk Nginx, Apache (HTTPD), MariaDB, PostgreSQL, dan Redis.
+- **Multi-Versi PHP:** Mengunduh dan berganti antar versi PHP sesuai kebutuhan proyek.
+- **Monitoring Real-time:** Menampilkan log output setiap service melalui terminal internal aplikasi.
+- **Akses Utilitas Cepat:** Shortcut ke folder proyek dan alat database.
+- **Konfigurasi Mudah:** Akses dan penyuntingan konfigurasi server dan database.
+
+#### Fitur Spesifik Windows
+
+- **Portable:** Environment berjalan dari folder `C:\gajahweb` tanpa memodifikasi registry.
+- **Database Tools:** Integrasi dengan HeidiSQL dan DBeaver.
+- **XAMPP Migration:** Utilitas untuk transisi dari XAMPP.
+- **OTA Updates:** Dukungan pembaruan aplikasi langsung.
+
+#### Fitur Spesifik Linux
+
+- **Multi-Distro Support:** Kompatibel dengan Debian/Ubuntu, RHEL/CentOS, Arch Linux, dan Alpine.
+- **System Integration:** Mengelola Nginx pada level sistem.
+- **Integrated Tools:** Menyertakan DBeaver CE untuk manajemen database.
+- **Standar Direktori:** Menggunakan struktur `/opt/runtime` untuk runtime dan aset.
+
+#### 1. Prasyarat
+
+Pastikan perangkat Anda memiliki:
+
+- Windows 10/11 (x64) atau distro Linux modern (x64)
+- Flutter SDK (stabil)
+- Untuk Windows: Visual Studio dengan komponen "Desktop development with C++"
+- Untuk Linux: dependensi build Flutter untuk distribusi Anda
+
+### Menjalankan Test
+
+- **Jalankan semua test:**
+```bash
+flutter test
+```
+
+- **Jalankan test dengan coverage:**
+```bash
+flutter test --coverage
+```
+
+<div align="center">
+
+# Gajah Webserver
+
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
@@ -148,12 +220,12 @@ Test suite yang tersedia (ringkasan):
 - `test/components/mariadb_control_dialog_test.dart` – `showConfirmDialog()` Ya/Tidak
 - `test/widget_test.dart` – placeholder aman
 
-### 🤝 Kontribusi
+### Kontribusi
 
 Kontribusi sangat kami harapkan! Silakan buka [Issue](https://github.com/yohanesokta/WebServices-Gajah/issues) atau [Pull Request](https://github.com/yohanesokta/WebServices-Gajah/pulls).
 
 
-### 📄 Lisensi
+### Lisensi
 
 Dirilis di bawah [Lisensi MIT](https://opensource.org/licenses/MIT).
 
