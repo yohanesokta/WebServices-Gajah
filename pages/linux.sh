@@ -125,27 +125,27 @@ detect_os() {
 
 install_nginx_debian() {
   sudo apt update -y
-  sudo apt install -y nginx
+  sudo apt install -y nginx net-tools libsqlite3-0 libsqlite3-dev
 }
 
 install_nginx_rhel() {
   if command -v dnf >/dev/null 2>&1; then
-    sudo dnf install -y nginx
+    sudo dnf install -y nginx net-tools sqlite sqlite-devel
   else
     sudo yum install -y epel-release
-    sudo yum install -y nginx
+    sudo yum install -y nginx net-tools sqlite sqlite-devel
   fi
 }
 
 install_nginx_arch() {
   step "Installing Nginx (Arch / EndeavourOS)"
-  sudo pacman -Sy --noconfirm nginx
+  sudo pacman -Sy --noconfirm nginx net-tools sqlite
   ok "Nginx installed"
 }
 
 install_nginx_alpine() {
   sudo apk update
-  sudo apk add nginx
+  sudo apk add nginx net-tools sqlite-libs sqlite-dev
 }
 
 start_nginx() {
@@ -364,8 +364,10 @@ fi
 
 echo
 green "Web Services installation completed!"
+echo "----------------------------------------"
+echo "Apache + PHP + MariaDB + phpMyAdmin + Nginx sudah terpasang. Coba Lihat Di Menu Aplikasi Anda!."
 echo
-echo "Next:"
+echo "CLI:"
 echo "  Start Apache : /opt/apache/bin/httpd"
 echo "  Start MariaDB: $RUNTIME_DIR/mysql/bin/mysqld_safe &"
 echo "  Nginx test   : curl http://localhost"
