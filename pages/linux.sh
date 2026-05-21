@@ -7,10 +7,18 @@ set -e
 RUNTIME_ROOT="/opt"
 RUNTIME_DIR="/opt/runtime"
 TEMP_DIR="$HOME/gajah_temp"
+WEB_ROOT="$HOME/Documents/www"
+
+# Hash variables (Placeholders - user will match them later)
+APACHE_HASH="555bbfa74fa464ac3ccedd3c009f960b6e3666777d20ef9179e85861f0fe6604"
+MYSQL_HASH="91241b6c1d6d18f61ad5cd7edd953e6dd1b1845f5980eda1e68f5d7f3bb88b83"
+PHPMYADMIN_HASH="6b99534f72ffb1d7275f50d23ca4141e1495c97d7cadb73a41d6dc580ed5ce29"
+DBEAVER_HASH="REPLACE_WITH_HASH"
+GAJAHWEB_HASH="2144b83c07f7fc99c9365547a3a7b8303d1f3181258ac0843de459d5d2727b3b"
 
 APACHE_URL="https://github.com/yohanesokta/PHP-Apache_Binaries_Static/releases/download/build-20251229-7/apache-php-linux_x86-64.tar.gz"
 MYSQL_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/mariadb-10.11.16-linux-systemd-x86_64.tar.gz"
-PHPMYADMIN_URL="https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.zip"
+PHPMYADMIN_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/phpMyAdmin-5.2.2-all-languages.zip"
 PHPMYADMIN_CONFIG_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/runtime/config.inc.php"
 DBEAVER_URL="https://dbeaver.io/files/dbeaver-ce-latest-linux.gtk.x86_64.tar.gz"
 GAJAHWEB_APP_URL="https://github.com/yohanesokta/WebServices-Gajah/releases/download/v2.1/gajahweb-linux_x86-64.tar.gz"
@@ -23,21 +31,63 @@ PHPMYADMIN_ARCHIVE="$TEMP_DIR/phpmyadmin-5.2.3.zip"
 ### UI HELPERS
 ### ===============================
 
-bold()   { echo -e "\033[1m$1\033[0m"; }
-green()  { echo -e "\033[32m$1\033[0m"; }
+bold() { echo -e "\033[1m$1\033[0m"; }
+green() { echo -e "\033[32m$1\033[0m"; }
 yellow() { echo -e "\033[33m$1\033[0m"; }
-red()    { echo -e "\033[31m$1\033[0m"; }
+red() { echo -e "\033[31m$1\033[0m"; }
 
-step() { echo; bold "▶ $1"; }
-ok()   { green "✔ $1"; }
-die()  { red "✖ $1"; exit 1; }
+step() {
+  echo
+  bold "[STEP] $1"
+}
+ok() { green "[OK] $1"; }
+
+CURRENT_FILE=""
+die() {
+  red "[ERROR] $1"
+  if [ -f "$CURRENT_FILE" ]; then
+    yellow "Removing corrupt file: $CURRENT_FILE"
+    rm -f "$CURRENT_FILE"
+  fi
+  exit 1
+}
 
 ### ===============================
 ### UTIL
 ### ===============================
 
+verify_hash() {
+  local file="$1" expected="$2"
+  if [ "$expected" = "REPLACE_WITH_HASH" ] || [ -z "$expected" ]; then
+    return 0
+  fi
+  if ! command -v sha256sum >/dev/null 2>&1; then
+    yellow "sha256sum not found, skipping hash verification"
+    return 0
+  fi
+  local actual
+  actual=$(sha256sum "$file" | awk '{print $1}')
+  if [ "$actual" != "$expected" ]; then
+    return 1
+  fi
+  return 0
+}
+
 download() {
-  local url="$1" out="$2"
+  local url="$1" out="$2" expected_hash="$3"
+  CURRENT_FILE="$out"
+
+  if [ -f "$out" ]; then
+    if verify_hash "$out" "$expected_hash"; then
+      ok "Using cached file: $(basename "$out")"
+      CURRENT_FILE=""
+      return 0
+    else
+      yellow "Hash mismatch for $(basename "$out"), re-downloading..."
+      rm -f "$out"
+    fi
+  fi
+
   if command -v wget >/dev/null 2>&1; then
     wget -q --show-progress -O "$out" "$url"
   elif command -v curl >/dev/null 2>&1; then
@@ -45,15 +95,22 @@ download() {
   else
     die "wget atau curl tidak ditemukan"
   fi
+
+  if ! verify_hash "$out" "$expected_hash"; then
+    die "Hash verification failed for $out"
+  fi
+  CURRENT_FILE=""
 }
 
 extract() {
   local archive="$1" dest="$2"
+  CURRENT_FILE="$archive"
   if command -v pv >/dev/null 2>&1; then
-    pv "$archive" | sudo tar -xf - -C "$dest"
+    pv "$archive" | sudo tar -xzf - -C "$dest"
   else
-    sudo tar -xf "$archive" -C "$dest"
+    sudo tar -xzf "$archive" -C "$dest"
   fi
+  CURRENT_FILE=""
 }
 
 ### ===============================
@@ -82,9 +139,7 @@ install_nginx_rhel() {
 
 install_nginx_arch() {
   step "Installing Nginx (Arch / EndeavourOS)"
-
   sudo pacman -Sy --noconfirm nginx
-
   ok "Nginx installed"
 }
 
@@ -107,7 +162,7 @@ start_nginx() {
 ### ===============================
 clear
 bold "Gajah Web Services Installer"
-echo "────────────────────────────────────────"
+echo "----------------------------------------"
 echo "Apache + PHP + MariaDB + phpMyAdmin + Nginx"
 
 ### ===============================
@@ -115,54 +170,87 @@ echo "Apache + PHP + MariaDB + phpMyAdmin + Nginx"
 ### ===============================
 step "Preparing directories"
 mkdir -p "$TEMP_DIR"
+mkdir -p "$WEB_ROOT"
 sudo mkdir -p "$RUNTIME_DIR"
+
+# Fix "Forbidden" issue by ensuring parent directories are executable (traversable)
+# and web root is readable.
+chmod o+x "$HOME"
+chmod o+x "$HOME/Documents"
+chmod -R 755 "$WEB_ROOT"
+
 ok "Directories ready"
 
-step "Cloning Scripts Repository"
-cd "$RUNTIME_DIR"
-sudo mkdir -p "$RUNTIME_DIR/utils"
-sudo chmod 777 -R "$RUNTIME_DIR/utils"
-git clone https://github.com/yohanesokta/utils_gajahweb.git --depth 1 "$RUNTIME_DIR/utils"
-ok "Scripts Repository cloned"
+if [ -d "$RUNTIME_DIR/utils" ]; then
+  echo "$RUNTIME_DIR/utils exists."
+else
+  step "Cloning Scripts Repository"
+  cd "$RUNTIME_DIR"
+  sudo mkdir -p "$RUNTIME_DIR/utils"
+  sudo chmod 777 -R "$RUNTIME_DIR/utils"
+  git clone https://github.com/yohanesokta/utils_gajahweb.git --depth 1 "$RUNTIME_DIR/utils"
+  ok "Scripts Repository cloned"
+fi
 
 ### ===============================
 ### APACHE + PHP
 ### ===============================
 step "Downloading Apache + PHP runtime"
-download "$APACHE_URL" "$APACHE_ARCHIVE"
+download "$APACHE_URL" "$APACHE_ARCHIVE" "$APACHE_HASH"
 ok "Apache + PHP downloaded"
 
 step "Extracting Apache + PHP runtime"
 extract "$APACHE_ARCHIVE" "$RUNTIME_ROOT"
 ok "Apache + PHP installed"
+
 sudo mkdir -p "$RUNTIME_DIR/php/session"
-sudo chmod 733 "$RUNTIME_DIR/php/session"
+sudo chmod 777 "$RUNTIME_DIR/php/session"
 ok "PHP session directory ready"
+
+step "Configuring PHP (php.ini)"
+# Copy pre-configured php.ini from the utils repository
+sudo cp "$RUNTIME_DIR/utils/baseconfig/unix/php.ini" "$RUNTIME_DIR/php/lib/php.ini"
+ok "PHP configured (Using pre-configured php.ini from utils)"
+
+step "Configuring Apache Web Root"
+sudo "$RUNTIME_DIR/utils/unix/configure_apache.sh" "$WEB_ROOT" 80
+ok "Apache configured with web root: $WEB_ROOT"
 
 ### ===============================
 ### PHPMYADMIN
 ### ===============================
 step "Downloading phpMyAdmin"
-download "$PHPMYADMIN_URL" "$PHPMYADMIN_ARCHIVE"
+download "$PHPMYADMIN_URL" "$PHPMYADMIN_ARCHIVE" "$PHPMYADMIN_HASH"
 ok "phpMyAdmin downloaded"
 
 step "Extracting phpMyAdmin"
-sudo unzip -q "$PHPMYADMIN_ARCHIVE" -d "$RUNTIME_ROOT/runtime/www"
-sudo mv "$RUNTIME_ROOT/runtime/www/phpMyAdmin-5.2.3-all-languages" \
-        "$RUNTIME_ROOT/runtime/www/phpmyadmin"
-ok "phpMyAdmin installed"
+sudo mkdir -p "$WEB_ROOT"
+# Clean up existing phpmyadmin dir if exists
+if [ -d "$WEB_ROOT/phpmyadmin" ]; then
+  sudo rm -rf "$WEB_ROOT/phpmyadmin"
+fi
 
-step "Downloading phpMyAdmin configuration"
-sudo mv "$RUNTIME_DIR/utils/baseconfig/unix/default/config.inc.txt" \
-        "$RUNTIME_DIR/www/phpmyadmin/config.inc.php"
-        
+# Extract and find the directory name (it might vary)
+sudo unzip -q "$PHPMYADMIN_ARCHIVE" -d "$WEB_ROOT"
+EXTRACTED_DIR=$(find "$WEB_ROOT" -maxdepth 1 -type d -name "phpMyAdmin-*" | head -n 1)
+
+if [ -n "$EXTRACTED_DIR" ]; then
+  sudo mv "$EXTRACTED_DIR" "$WEB_ROOT/phpmyadmin"
+  ok "phpMyAdmin installed in $WEB_ROOT/phpmyadmin"
+else
+  die "Could not find extracted phpMyAdmin directory in $WEB_ROOT"
+fi
+
+step "Configuring phpMyAdmin"
+sudo cp "$RUNTIME_DIR/utils/baseconfig/unix/default/config.inc.conf" \
+  "$WEB_ROOT/phpmyadmin/config.inc.php"
 ok "phpMyAdmin configuration ready"
 
 ### ===============================
 ### MARIADB
 ### ===============================
 step "Downloading MariaDB runtime"
-download "$MYSQL_URL" "$MYSQL_ARCHIVE"
+download "$MYSQL_URL" "$MYSQL_ARCHIVE" "$MYSQL_HASH"
 ok "MariaDB downloaded"
 
 step "Extracting MariaDB runtime"
@@ -206,58 +294,60 @@ step "Installing Nginx"
 detect_os
 
 case "$OS_ID" in
-  ubuntu|debian|linuxmint)
+ubuntu | debian | linuxmint)
+  install_nginx_debian
+  ;;
+centos | rhel | rocky | almalinux | fedora)
+  install_nginx_rhel
+  ;;
+alpine)
+  install_nginx_alpine
+  ;;
+arch | endeavouros | manjaro)
+  install_nginx_arch
+  ;;
+*)
+  if [[ "$OS_LIKE" == *debian* ]]; then
     install_nginx_debian
-    ;;
-  centos|rhel|rocky|almalinux|fedora)
+  elif [[ "$OS_LIKE" == *rhel* ]]; then
     install_nginx_rhel
-    ;;
-  alpine)
-    install_nginx_alpine
-    ;;
-  arch|endeavouros|manjaro)
+  elif [[ "$OS_LIKE" == *arch* ]]; then
     install_nginx_arch
-    ;;
-  *)
-    if [[ "$OS_LIKE" == *debian* ]]; then
-      install_nginx_debian
-    elif [[ "$OS_LIKE" == *rhel* ]]; then
-      install_nginx_rhel
-    elif [[ "$OS_LIKE" == *arch* ]]; then
-      install_nginx_arch
-    else
-      die "OS tidak didukung untuk Nginx: $OS_ID"
-    fi
-    ;;
+  else
+    die "OS tidak didukung untuk Nginx: $OS_ID"
+  fi
+  ;;
 esac
-
 
 start_nginx
 sudo systemctl disable --now nginx
-ok "Nginx installed & running"
+ok "Nginx installed"
 
 step "Configuring Gajah runtime scripts"
-sudo mv $RUNTIME_DIR/utils/baseconfig/unix/default/php-cgi.sh $RUNTIME_DIR/php-cgi.sh
-sudo chmod +x $RUNTIME_DIR/php-cgi.sh
+sudo mv "$RUNTIME_DIR/utils/baseconfig/unix/default/php-cgi.sh" "$RUNTIME_DIR/php-cgi.sh"
+sudo chmod +x "$RUNTIME_DIR/php-cgi.sh"
 
-sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
-sudo /opt/runtime/utils/unix/configure_nginx.sh /opt/runtime/www 80
+if [ -f /etc/nginx/nginx.conf ]; then
+  sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+fi
+sudo "$RUNTIME_DIR/utils/unix/configure_nginx.sh" "$WEB_ROOT" 80
 sudo systemctl restart nginx
 
 ok "Gajah runtime scripts ready"
 
 step "Installing DBeaver (Database Client)"
-download "$DBEAVER_URL" "$TEMP_DIR/dbeaver.tar.gz"
+download "$DBEAVER_URL" "$TEMP_DIR/dbeaver.tar.gz" ""
 sudo tar -xzf "$TEMP_DIR/dbeaver.tar.gz" -C "/opt/runtime"
 ok "DBeaver installed in /opt/runtime/dbeaver"
 
 step "Installing GajahWeb Application"
-download "$GAJAHWEB_APP_URL" "$TEMP_DIR/gajahweb-linux_x86-64.tar.gz"
+download "$GAJAHWEB_APP_URL" "$TEMP_DIR/gajahweb-linux_x86-64.tar.gz" "$GAJAHWEB_HASH"
 sudo mkdir -p "$RUNTIME_DIR/bin"
 sudo tar -xzf "$TEMP_DIR/gajahweb-linux_x86-64.tar.gz" -C "$RUNTIME_DIR/bin"
-sudo cp "$RUNTIME_DIR/bin/data/flutter_assets/resource/gajahweb.desktop" "/usr/share/applications/gajahweb.desktop"
+if [ -f "$RUNTIME_DIR/bin/data/flutter_assets/resource/gajahweb.desktop" ]; then
+  sudo cp "$RUNTIME_DIR/bin/data/flutter_assets/resource/gajahweb.desktop" "/usr/share/applications/gajahweb.desktop"
+fi
 ok "GajahWeb Application installed in /opt/runtime/gajahweb"
-
 
 ### ===============================
 ### CLEANUP
@@ -273,11 +363,11 @@ fi
 ### ===============================
 
 echo
-green "🎉 Web Services installation completed!"
+green "Web Services installation completed!"
 echo
 echo "Next:"
 echo "  Start Apache : /opt/apache/bin/httpd"
 echo "  Start MariaDB: $RUNTIME_DIR/mysql/bin/mysqld_safe &"
 echo "  Nginx test   : curl http://localhost"
 echo
-echo "🐘 Gajah runtime siap dipakai."
+echo "Gajah runtime siap dipakai."
