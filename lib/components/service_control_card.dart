@@ -9,6 +9,8 @@ class ServiceControlCard extends StatelessWidget {
   final ValueChanged<bool> onChanged;
   final VoidCallback? onLaunch;
   final String imageAsset;
+  final bool isInstalled;
+  final VoidCallback? onInstall;
 
   const ServiceControlCard({
     super.key,
@@ -19,6 +21,8 @@ class ServiceControlCard extends StatelessWidget {
     required this.onChanged,
     this.onLaunch,
     required this.imageAsset,
+    this.isInstalled = true,
+    this.onInstall,
   });
 
   @override
@@ -96,11 +100,19 @@ class ServiceControlCard extends StatelessWidget {
                   ),
                   SizedBox(
                     height: 24,
-                    child: Switch(
-                      value: value,
-                      onChanged: onChanged,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
+                    child: !isInstalled
+                        ? IconButton(
+                            padding: EdgeInsets.zero,
+                            iconSize: 20,
+                            icon: const Icon(Icons.download),
+                            onPressed: onInstall,
+                            color: theme.primaryColor,
+                          )
+                        : Switch(
+                            value: value,
+                            onChanged: onChanged,
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                   ),
                 ],
               ),

@@ -21,10 +21,22 @@ class _PgadmincontrolState extends State<Pgadmincontrol>
   bool _isManualChanging = false;
   Timer? _statusTimer;
 
-  static const String _pgadminBasePath = r'C:\gajahweb\pgadmin';
-  static const String _pythonExe = r'C:\gajahweb\python\python.exe';
-  static const String _pgadminScript =
-      r'C:\gajahweb\python\Lib\site-packages\pgadmin4\pgAdmin4.py';
+  bool _isInstalled = true;
+
+  String get _pgadminBasePath {
+    if (Platform.isLinux) {
+      final home = Platform.environment['HOME'] ?? '';
+      return '$home/.gajahweb/pgadmin';
+    }
+    return r'C:\gajahweb\pgadmin';
+  }
+
+  String get _venvPath => Platform.isLinux ? '$_pgadminBasePath/venv' : '$_pgadminBasePath\\venv';
+
+  String get _pythonExe => Platform.isLinux ? '$_venvPath/bin/python3' : '$_venvPath\\Scripts\\python.exe';
+
+  String get _pipExe => Platform.isLinux ? '$_venvPath/bin/pip' : '$_venvPath\\Scripts\\pip.exe';
+
   static const String _defaultPort = '5050';
   static const Duration _statusCheckDelay = Duration(seconds: 3);
 
@@ -70,6 +82,58 @@ UPGRADE_CHECK_ENABLED = False
     }
   }
 
+  Future<void> _checkIfInstalled() async {
+    final installed = await File(_pythonExe).exists();
+    if (mounted) {
+      setState(() {
+        _isInstalled = installed;
+      });
+    }
+  }
+
+  Future<void> _installPgadmin() async {
+    if (mounted) {
+      setState(() {
+        _isManualChanging = true;
+      });
+    }
+    sendTerminal('Memulai instalasi pgAdmin 4...');
+    
+    try {
+      await Directory(_pgadminBasePath).create(recursive: true);
+      
+      sendTerminal('Membuat virtual environment...');
+      final pythonCmd = Platform.isLinux ? 'python3' : 'python';
+      final venvResult = await Process.run(pythonCmd, ['-m', 'venv', 'venv'], workingDirectory: _pgadminBasePath);
+      if (venvResult.exitCode != 0) {
+        sendTerminal('Gagal membuat venv: ${venvResult.stderr}');
+        throw Exception('Venv creation failed');
+      }
+
+      sendTerminal('Mengunduh dan menginstal pgadmin4 (bisa memakan waktu)...');
+      final installResult = await Process.run(_pipExe, ['install', 'pgadmin4'], workingDirectory: _pgadminBasePath);
+      if (installResult.exitCode != 0) {
+        sendTerminal('Gagal menginstal pgadmin4: ${installResult.stderr}');
+        throw Exception('Pgadmin4 installation failed');
+      }
+      
+      sendTerminal('Instalasi pgAdmin 4 selesai.');
+      if (mounted) {
+        setState(() {
+          _isInstalled = true;
+        });
+      }
+    } catch (e) {
+      sendTerminal('Error instalasi: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isManualChanging = false;
+        });
+      }
+    }
+  }
+
   Future<void> _triggerPgadmin(bool value) async {
     _isManualChanging = true;
     final prefs = await SharedPreferences.getInstance();
@@ -78,9 +142,12 @@ UPGRADE_CHECK_ENABLED = False
     try {
       if (value) {
         await _writeConfigLocal(port);
+        final scriptResult = await Process.run(_pythonExe, ['-c', 'import os, pgadmin4; print(os.path.join(os.path.dirname(pgadmin4.__file__), "pgAdmin4.py"))']);
+        final pgadminScript = scriptResult.stdout.toString().trim();
+        
         await Process.start(
           _pythonExe,
-          [_pgadminScript],
+          [pgadminScript],
           workingDirectory: _pgadminBasePath,
           runInShell: false,
           mode: ProcessStartMode.detached,
@@ -126,7 +193,7 @@ UPGRADE_CHECK_ENABLED = False
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _checkPgadminStatus();
+    _checkIfInstalled().then((_) => _checkPgadminStatus());
   }
 
   @override
@@ -153,6 +220,8 @@ UPGRADE_CHECK_ENABLED = False
       onChanged: _triggerPgadmin,
       onLaunch: status ? _launchPgAdmin : null,
       imageAsset: 'assets/pgadmin.png',
+      isInstalled: _isInstalled,
+      onInstall: _installPgadmin,
     );
   }
 }
