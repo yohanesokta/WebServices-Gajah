@@ -106,9 +106,37 @@ class _PgadmincontrolState extends State<Pgadmincontrol>
       final prefs = await SharedPreferences.getInstance();
       final port = prefs.getString('pgadminPort') ?? _defaultPort;
       await _launchPgadminBatch('install', port);
-      await sendTerminal('Memulai instalasi pgAdmin 4\nBerhasil');
+      await sendTerminal(
+        'Memulai instalasi pgAdmin 4 dan package pgadmin4\nBerhasil',
+      );
     } catch (error) {
       debugPrint('Gagal memulai instalasi pgAdmin: $error');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isManualChanging = false;
+          _isInstalling = false;
+        });
+      }
+      _checkIfInstalled();
+    }
+  }
+
+  Future<void> _updatePgadmin() async {
+    if (mounted) {
+      setState(() {
+        _isManualChanging = true;
+        _isInstalling = true;
+      });
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final port = prefs.getString('pgadminPort') ?? _defaultPort;
+      await _launchPgadminBatch('update', port);
+      await sendTerminal('Memulai update package pgadmin4\nBerhasil');
+    } catch (error) {
+      debugPrint('Gagal memulai update pgAdmin: $error');
     } finally {
       if (mounted) {
         setState(() {
@@ -185,6 +213,7 @@ class _PgadmincontrolState extends State<Pgadmincontrol>
       value: status,
       onChanged: _isInstalling ? null : _triggerPgadmin,
       onLaunch: status ? _launchPgAdmin : null,
+      onUpdate: _isInstalled && !_isInstalling ? _updatePgadmin : null,
       imageAsset: 'assets/pgadmin.png',
       isInstalled: _isInstalling ? false : _isInstalled,
       onInstall: _installPgadmin,

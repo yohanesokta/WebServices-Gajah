@@ -7,6 +7,7 @@ class ServiceControlCard extends StatelessWidget {
   final bool value;
   final ValueChanged<bool>? onChanged;
   final VoidCallback? onLaunch;
+  final VoidCallback? onUpdate;
   final String imageAsset;
   final bool isInstalled;
   final VoidCallback? onInstall;
@@ -20,6 +21,7 @@ class ServiceControlCard extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.onLaunch,
+    this.onUpdate,
     required this.imageAsset,
     this.isInstalled = true,
     this.onInstall,
@@ -115,11 +117,24 @@ class ServiceControlCard extends StatelessWidget {
                             onPressed: onInstall,
                             color: theme.primaryColor,
                           )
-                        : Switch(
-                            value: value,
-                            onChanged: onChanged,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (onUpdate != null)
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  iconSize: 18,
+                                  icon: const Icon(Icons.system_update_alt),
+                                  onPressed: onUpdate,
+                                  color: theme.primaryColor,
+                                ),
+                              Switch(
+                                value: value,
+                                onChanged: onChanged,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ],
                           ),
                   ),
                 ],
