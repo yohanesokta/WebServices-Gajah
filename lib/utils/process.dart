@@ -2,7 +2,7 @@ import "dart:io";
 import "dart:convert";
 import "dart:async";
 
-String executablePath = File(Platform.resolvedExecutable).parent.path;
+String executablePath = "C:\\gajahweb\\";
 String executableRuntime = "$executablePath\\data\\flutter_assets";
 
 List<dynamic> processData = [];
