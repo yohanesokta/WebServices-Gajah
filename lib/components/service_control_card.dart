@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class ServiceControlCard extends StatelessWidget {
@@ -6,9 +5,13 @@ class ServiceControlCard extends StatelessWidget {
   final String statusText;
   final Color statusColor;
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
   final VoidCallback? onLaunch;
+  final VoidCallback? onUpdate;
   final String imageAsset;
+  final bool isInstalled;
+  final VoidCallback? onInstall;
+  final bool isBusy;
 
   const ServiceControlCard({
     super.key,
@@ -18,7 +21,11 @@ class ServiceControlCard extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.onLaunch,
+    this.onUpdate,
     required this.imageAsset,
+    this.isInstalled = true,
+    this.onInstall,
+    this.isBusy = false,
   });
 
   @override
@@ -43,29 +50,29 @@ class ServiceControlCard extends StatelessWidget {
                     height: 40,
                     fit: BoxFit.contain,
                   ),
-                  (onLaunch != null) ? 
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        iconSize: 18,
-                        icon: const Icon(Icons.open_in_new),
-                        onPressed: onLaunch,
-                        color: theme.textTheme.bodySmall?.color,
-                      ),
-                    )
-                  : SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        iconSize: 18,
-                        icon: const Icon(Icons.open_in_new),
-                        onPressed: onLaunch,
-                        color: const Color.fromARGB(255, 46, 46, 46),
-                      ),
-                    ),
+                  (onLaunch != null)
+                      ? SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            iconSize: 18,
+                            icon: const Icon(Icons.open_in_new),
+                            onPressed: onLaunch,
+                            color: theme.textTheme.bodySmall?.color,
+                          ),
+                        )
+                      : SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            iconSize: 18,
+                            icon: const Icon(Icons.open_in_new),
+                            onPressed: onLaunch,
+                            color: const Color.fromARGB(255, 46, 46, 46),
+                          ),
+                        ),
                 ],
               ),
               const Spacer(),
@@ -96,11 +103,39 @@ class ServiceControlCard extends StatelessWidget {
                   ),
                   SizedBox(
                     height: 24,
-                    child: Switch(
-                      value: value,
-                      onChanged: onChanged,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
+                    child: isBusy
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2.2),
+                          )
+                        : !isInstalled
+                        ? IconButton(
+                            padding: EdgeInsets.zero,
+                            iconSize: 20,
+                            icon: const Icon(Icons.download),
+                            onPressed: onInstall,
+                            color: theme.primaryColor,
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (onUpdate != null)
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  iconSize: 18,
+                                  icon: const Icon(Icons.system_update_alt),
+                                  onPressed: onUpdate,
+                                  color: theme.primaryColor,
+                                ),
+                              Switch(
+                                value: value,
+                                onChanged: onChanged,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ],
+                          ),
                   ),
                 ],
               ),
