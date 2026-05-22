@@ -3,8 +3,6 @@
 echo off
 cls
 
-cd data\flutter_assets
-cd resource
 
 set "outdir=C:\gajahweb"
 set "filePath=%outdir%\var"
@@ -21,18 +19,17 @@ if exist "%filePath%\%1.zip" (
 rmdir /s /q %outdir%\php
 taskkill /F /IM php-cgi.exe
 powershell -command "Expand-Archive -Force '%filePath%\%1.zip' '%outdir%\php\'"
-powershell -command "Expand-Archive -Force 'config.zip' '%outdir%\config\'"
 goto %3
 
 
 :legacy
 echo Copy Legacy Config!
-copy %outdir%\config\php.ini-legacy %outdir%\php\php.ini
+copy %outdir%\data\flutter_assets\utils\baseconfig\windows\php.ini-legacy %outdir%\php\php.ini
 goto nginxstop
 
 :universal
 echo Copy Universal Config!
-copy %outdir%\config\php.ini-universal %outdir%\php\php.ini
+copy %outdir%\data\flutter_assets\utils\baseconfig\windows\php.ini-universal %outdir%\php\php.ini
 mkdir %outdir%\php\sessions
 goto nginxstop
 
@@ -45,5 +42,4 @@ taskkill /F /IM php-cgi.exe
 
 :caching
 mkdir %outdir%\php\tmp
-rmdir /s /q %outdir%\config
 echo %1 >> %outdir%\install.log

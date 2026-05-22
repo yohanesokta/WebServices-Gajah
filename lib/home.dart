@@ -21,7 +21,6 @@ class HomeApp extends StatefulWidget {
 class _HomeAppState extends State<HomeApp> {
   bool _isTerminalVisible = Platform.isLinux;
   @override
-
   void initState() {
     super.initState();
     getConfig();
@@ -47,23 +46,24 @@ class _HomeAppState extends State<HomeApp> {
         actions: [
           Tooltip(
             message: "Download PHP Versions",
-            child:
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, "/download"),
-            icon: const Icon(Icons.download),
-          )),
+            child: IconButton(
+              onPressed: () => Navigator.pushNamed(context, "/download"),
+              icon: const Icon(Icons.download),
+            ),
+          ),
           const SizedBox(width: 10),
           Tooltip(
             message: "Check for Updates",
             child: IconButton(
               onPressed: () async {
-                      await Process.start('C:\\gajahweb\\ota-update.exe',
-                      [],
-                      runInShell: false,
-                      mode: ProcessStartMode.detached,
-                      workingDirectory: "C:\\gajahweb\\",
-                    );
-                  },
+                await Process.start(
+                  'C:\\gajahweb\\ota-update.exe',
+                  [],
+                  runInShell: false,
+                  mode: ProcessStartMode.detached,
+                  workingDirectory: "C:\\gajahweb\\",
+                );
+              },
               icon: const Icon(Icons.update),
             ),
           ),
@@ -120,21 +120,25 @@ class _HomeAppState extends State<HomeApp> {
                   );
                 },
               ),
-              (Platform.isWindows) ?
-              Column(
-                children: [
-                  const SizedBox(height: 24),
-              const Text(
-                "Utilities",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
+              (Platform.isWindows)
+                  ? Column(
+                      children: [
+                        const SizedBox(height: 24),
+                        const Text(
+                          "Utilities",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
 
-              const SizedBox(height: 12),
-              const Xamppsameless(),
-              const SizedBox(height: 12),
-                ],
-              ) : const SizedBox(height: 12),
-              
+                        const SizedBox(height: 12),
+                        const Xamppsameless(),
+                        const SizedBox(height: 12),
+                      ],
+                    )
+                  : const SizedBox(height: 12),
+
               Row(
                 children: [
                   const SizedBox(width: 12),
@@ -142,22 +146,25 @@ class _HomeAppState extends State<HomeApp> {
                     label: "DBeaver",
                     icon: Icons.data_array,
                     onTap: () => {
-                      (Platform.isWindows) ?
-                      startProgram(
-                        "C:\\gajahweb\\dbeaver\\dbeaver.exe",
-                        [],)
-                        : startProgram("/opt/runtime/dbeaver/dbeaver", [])
+                      (Platform.isWindows)
+                          ? startProgram(
+                              "C:\\gajahweb\\dbeaver\\dbeaver.exe",
+                              [],
+                            )
+                          : startProgram("/opt/runtime/dbeaver/dbeaver", []),
                     },
-                  ) ,
+                  ),
                   const SizedBox(width: 12),
                   _UtilityButton(
                     label: "Htdocs",
                     icon: Icons.folder,
                     onTap: () => {
-                            Platform.isWindows ?
-                            startProgram('explorer.exe', ["C:\\gajahweb\\htdocs"]): 
-                            startProgram("xdg-open", ["/opt/runtime/www"])
-                        },
+                      Platform.isWindows
+                          ? startProgram('explorer.exe', [
+                              "C:\\gajahweb\\htdocs",
+                            ])
+                          : startProgram("xdg-open", ["/opt/runtime/www"]),
+                    },
                   ),
                 ],
               ),
@@ -180,7 +187,7 @@ class _HomeAppState extends State<HomeApp> {
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Row(
             children: [
-              const Text("Build v2.3", style: TextStyle(fontSize: 12)),
+              const Text("Build v3.0", style: TextStyle(fontSize: 12)),
               const Spacer(),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, "/about"),
