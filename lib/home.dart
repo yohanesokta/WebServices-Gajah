@@ -155,6 +155,23 @@ class _HomeAppState extends State<HomeApp> {
                     },
                   ),
                   const SizedBox(width: 12),
+                  (Platform.isWindows)
+                      ? _UtilityButton(
+                          label: "HeidiSQL",
+                          icon: Icons.data_array,
+                          onTap: () => {
+                            (Platform.isWindows)
+                                ? startProgram(
+                                    "C:\\gajahweb\\heidisql\\heidisql.exe",
+                                    [],
+                                  )
+                                : startProgram(
+                                    "/opt/runtime/dbeaver/dbeaver",
+                                    [],
+                                  ),
+                          },
+                        )
+                      : const SizedBox(width: 0),
                   _UtilityButton(
                     label: "Htdocs",
                     icon: Icons.folder,
