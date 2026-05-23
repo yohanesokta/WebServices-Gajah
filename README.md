@@ -4,7 +4,7 @@
 
 Gajah Webserver is a desktop control panel (built with Flutter) for managing local web services and runtimes on Windows and Linux.
 
-Latest release: [2.4](https://github.com/yohanesokta/WebServices-Gajah/releases/tag/2.4)
+Latest release: [3.0](https://github.com/yohanesokta/WebServices-Gajah/releases/tag/3.0)
 
 ## Deskripsi
 
@@ -75,6 +75,3 @@ flutter test
 flutter test --coverage
 ```
 
-## Lisensi
-
-Dirilis di bawah Lisensi MIT.
