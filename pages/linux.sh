@@ -9,6 +9,8 @@ RUNTIME_DIR="/opt/runtime"
 TEMP_DIR="$HOME/gajah_temp"
 WEB_ROOT="$HOME/Documents/www"
 
+SUCCESS=false
+
 # Hash variables (Placeholders - user will match them later)
 APACHE_HASH="555bbfa74fa464ac3ccedd3c009f960b6e3666777d20ef9179e85861f0fe6604"
 MYSQL_HASH="91241b6c1d6d18f61ad5cd7edd953e6dd1b1845f5980eda1e68f5d7f3bb88b83"
@@ -42,15 +44,72 @@ step() {
 }
 ok() { green "[OK] $1"; }
 
-CURRENT_FILE=""
+DOWNLOADING_FILE=""
 die() {
   red "[ERROR] $1"
-  if [ -f "$CURRENT_FILE" ]; then
-    yellow "Removing corrupt file: $CURRENT_FILE"
-    rm -f "$CURRENT_FILE"
-  fi
   exit 1
 }
+
+cleanup() {
+  local exit_code=$?
+  trap - EXIT INT TERM ERR
+  if [ "$SUCCESS" != "true" ]; then
+    echo
+    red "[CLEANUP] Installation failed or was interrupted. Cleaning up..."
+    if [ -n "$DOWNLOADING_FILE" ] && [ -f "$DOWNLOADING_FILE" ]; then
+      yellow "Removing incomplete download: $DOWNLOADING_FILE"
+      rm -f "$DOWNLOADING_FILE"
+    fi
+    if pgrep -f "mysqld" >/dev/null; then
+      yellow "Stopping MariaDB/MySQL processes..."
+      sudo pkill -f "mysqld" || true
+    fi
+    sudo rm -f /tmp/mysql.sock
+    if pgrep -f "httpd" >/dev/null; then
+      yellow "Stopping Apache processes..."
+      sudo pkill -f "httpd" || true
+    fi
+    if pgrep -f "php-cgi" >/dev/null; then
+      yellow "Stopping PHP-CGI processes..."
+      sudo pkill -f "php-cgi" || true
+    fi
+    if [ -d "$RUNTIME_DIR" ]; then
+      yellow "Removing all contents of $RUNTIME_DIR..."
+      sudo rm -rf "$RUNTIME_DIR"
+    fi
+    if [ -d "/opt/apache" ]; then
+      yellow "Removing Apache directory..."
+      sudo rm -rf "/opt/apache"
+    fi
+    if [ -d "$WEB_ROOT/phpmyadmin" ]; then
+      yellow "Removing phpMyAdmin from web root..."
+      sudo rm -rf "$WEB_ROOT/phpmyadmin"
+    fi
+    if [ -f "/usr/share/applications/gajahweb.desktop" ]; then
+      yellow "Removing desktop shortcut..."
+      sudo rm -f "/usr/share/applications/gajahweb.desktop"
+    fi
+    if [ -f /etc/nginx/nginx.conf.bak ]; then
+      yellow "Restoring original Nginx configuration..."
+      sudo mv /etc/nginx/nginx.conf.bak /etc/nginx/nginx.conf
+      if command -v systemctl >/dev/null 2>&1; then
+        sudo systemctl restart nginx || true
+      fi
+    fi
+    local code=$exit_code
+    if [ "$code" -eq 0 ]; then
+      code=1
+    fi
+    exit "$code"
+  else
+    if [ -d "$TEMP_DIR" ]; then
+      step "Cleaning up temporary files"
+      rm -rf "$TEMP_DIR"
+      ok "Temporary files removed"
+    fi
+  fi
+}
+trap cleanup EXIT INT TERM ERR
 
 ### ===============================
 ### UTIL
@@ -75,12 +134,12 @@ verify_hash() {
 
 download() {
   local url="$1" out="$2" expected_hash="$3"
-  CURRENT_FILE="$out"
+  DOWNLOADING_FILE="$out"
 
   if [ -f "$out" ]; then
     if verify_hash "$out" "$expected_hash"; then
       ok "Using cached file: $(basename "$out")"
-      CURRENT_FILE=""
+      DOWNLOADING_FILE=""
       return 0
     else
       yellow "Hash mismatch for $(basename "$out"), re-downloading..."
@@ -97,20 +156,20 @@ download() {
   fi
 
   if ! verify_hash "$out" "$expected_hash"; then
+    rm -f "$out"
+    DOWNLOADING_FILE=""
     die "Hash verification failed for $out"
   fi
-  CURRENT_FILE=""
+  DOWNLOADING_FILE=""
 }
 
 extract() {
   local archive="$1" dest="$2"
-  CURRENT_FILE="$archive"
   if command -v pv >/dev/null 2>&1; then
     pv "$archive" | sudo tar -xzf - -C "$dest"
   else
     sudo tar -xzf "$archive" -C "$dest"
   fi
-  CURRENT_FILE=""
 }
 
 ### ===============================
@@ -124,28 +183,53 @@ detect_os() {
 }
 
 install_nginx_debian() {
-  sudo apt update -y
-  sudo apt install -y nginx net-tools libsqlite3-0 libsqlite3-dev
+  if ! command -v nginx >/dev/null 2>&1; then
+    sudo apt update -y || yellow "Warning: apt update failed, attempting package install anyway..."
+    sudo apt install -y nginx net-tools libsqlite3-0 libsqlite3-dev
+  else
+    ok "Nginx is already installed. Skipping Nginx package installation."
+    # Try to install dependencies but don't fail if they are already present or repository is offline
+    sudo apt install -y net-tools libsqlite3-0 libsqlite3-dev || true
+  fi
 }
 
 install_nginx_rhel() {
-  if command -v dnf >/dev/null 2>&1; then
-    sudo dnf install -y nginx net-tools sqlite sqlite-devel
+  if ! command -v nginx >/dev/null 2>&1; then
+    if command -v dnf >/dev/null 2>&1; then
+      sudo dnf install -y nginx net-tools sqlite sqlite-devel libxcrypt-compat
+    else
+      sudo yum install -y epel-release
+      sudo yum install -y nginx net-tools sqlite sqlite-devel libxcrypt-compat
+    fi
   else
-    sudo yum install -y epel-release
-    sudo yum install -y nginx net-tools sqlite sqlite-devel
+    ok "Nginx is already installed. Skipping Nginx package installation."
+    if command -v dnf >/dev/null 2>&1; then
+      sudo dnf install -y net-tools sqlite sqlite-devel libxcrypt-compat || true
+    else
+      sudo yum install -y net-tools sqlite sqlite-devel libxcrypt-compat || true
+    fi
   fi
 }
 
 install_nginx_arch() {
-  step "Installing Nginx (Arch / EndeavourOS)"
-  sudo pacman -Sy --noconfirm nginx net-tools sqlite
-  ok "Nginx installed"
+  if ! command -v nginx >/dev/null 2>&1; then
+    step "Installing Nginx (Arch / EndeavourOS)"
+    sudo pacman -Sy --noconfirm nginx net-tools sqlite libxcrypt-compat
+    ok "Nginx installed"
+  else
+    ok "Nginx is already installed. Skipping Nginx package installation."
+    sudo pacman -Sy --noconfirm net-tools sqlite libxcrypt-compat || true
+  fi
 }
 
 install_nginx_alpine() {
-  sudo apk update
-  sudo apk add nginx net-tools sqlite-libs sqlite-dev
+  if ! command -v nginx >/dev/null 2>&1; then
+    sudo apk update || true
+    sudo apk add nginx net-tools sqlite-libs sqlite-dev
+  else
+    ok "Nginx is already installed. Skipping Nginx package installation."
+    sudo apk add net-tools sqlite-libs sqlite-dev || true
+  fi
 }
 
 start_nginx() {
@@ -164,6 +248,21 @@ clear
 bold "Gajah Web Services Installer"
 echo "----------------------------------------"
 echo "Apache + PHP + MariaDB + phpMyAdmin + Nginx"
+
+step "Stopping any existing Gajah Web Services processes"
+if pgrep -f "mysqld" >/dev/null; then
+  yellow "Stopping running MariaDB/MySQL processes..."
+  sudo pkill -f "mysqld" || true
+fi
+sudo rm -f /tmp/mysql.sock
+if pgrep -f "httpd" >/dev/null; then
+  yellow "Stopping running Apache processes..."
+  sudo pkill -f "httpd" || true
+fi
+if pgrep -f "php-cgi" >/dev/null; then
+  yellow "Stopping running PHP-CGI processes..."
+  sudo pkill -f "php-cgi" || true
+fi
 
 ### ===============================
 ### PREPARE
@@ -280,12 +379,44 @@ sudo "$RUNTIME_DIR/mysql/scripts/mysql_install_db" \
   --datadir="$RUNTIME_DIR/mysql/data"
 ok "MariaDB initialized (root password kosong)"
 
-sudo -u mysql "$RUNTIME_DIR/mysql/bin/mysqld_safe" --basedir="$RUNTIME_DIR/mysql" &
-sleep 3
-sudo -u root "$RUNTIME_DIR/mysql/bin/mysql" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root123'; FLUSH PRIVILEGES;"
+# Ensure no stale socket exists
+sudo rm -f /tmp/mysql.sock
+
+# Cache sudo credentials for the mysql user in the foreground first
+# so that the subsequent background sudo command does not prompt for a password
+sudo -u mysql true
+
+sudo -u mysql "$RUNTIME_DIR/mysql/bin/mysqld_safe" \
+  --basedir="$RUNTIME_DIR/mysql" \
+  --datadir="$RUNTIME_DIR/mysql/data" \
+  --socket="/tmp/mysql.sock" \
+  --log-error="/tmp/mysql.err" &
+
+# Wait for mysql.sock to be created, up to 30 seconds
+echo -n "Waiting for MariaDB to start..."
+for i in {1..30}; do
+  if [ -S "/tmp/mysql.sock" ]; then
+    echo " started!"
+    break
+  fi
+  echo -n "."
+  sleep 1
+done
+if [ ! -S "/tmp/mysql.sock" ]; then
+  echo " failed!"
+  if [ -f "/tmp/mysql.err" ]; then
+    echo
+    bold "--- MariaDB Error Log (/tmp/mysql.err) ---"
+    cat "/tmp/mysql.err"
+    echo "------------------------------------------"
+  fi
+  die "MariaDB did not start in time. Check logs or permissions."
+fi
+
+sudo "$RUNTIME_DIR/mysql/bin/mysql" --socket="/tmp/mysql.sock" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root123'; FLUSH PRIVILEGES;"
 ok "MariaDB root password diset ke 'root123'"
 sleep 2
-sudo "$RUNTIME_DIR/mysql/bin/mysqladmin" -u root -proot123 shutdown
+sudo "$RUNTIME_DIR/mysql/bin/mysqladmin" --socket="/tmp/mysql.sock" -u root -proot123 shutdown
 
 ### ===============================
 ### NGINX
@@ -352,11 +483,7 @@ ok "GajahWeb Application installed in /opt/runtime/gajahweb"
 ### ===============================
 ### CLEANUP
 ### ===============================
-if [ -d "$TEMP_DIR" ]; then
-  step "Cleaning up temporary files"
-  rm -rf "$TEMP_DIR"
-  ok "Temporary files removed"
-fi
+SUCCESS=true
 
 ### ===============================
 ### DONE
